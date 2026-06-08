@@ -1,0 +1,1 @@
+//khai báo hàm sao kê, lịch sử
