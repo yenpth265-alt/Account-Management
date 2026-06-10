@@ -1,4 +1,4 @@
-#include "models/account.h"
+#include "../../include/models/account.h"
 #include <iostream>
 
 //1. Triển khai hàm khởi tạo
@@ -65,7 +65,7 @@ bool Account::rutTien(double soTien) {
 }
 //Hàm xuất thông tin
 void Account::xuatThongTin() const {
-    std::cout << "STK: " << this->maTK 
+    std::cout << "STK: " << this->soTK 
               << " | Ma KH: " << this->maKH 
               << " | So du: " << std::fixed << this->soDu << " VND" 
               << std::endl;
