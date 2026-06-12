@@ -7,10 +7,10 @@ BankSystem::BankSystem() {
 // ==========================================
 // 1. KIỂM TRA TRÙNG SỐ TÀI KHOẢN
 // ==========================================
-bool BankSystem::kiemTraTrungSTK(std::string maTK) {
+bool BankSystem::kiemTraTrungSTK(std::string soTK) {
     Node<Account>* current = danhSachTK.getHead();
     while (current != nullptr) {
-        if (current->data.getMaTK() == maTK) {
+        if (current->data.getSoTK() == soTK) {
             return true; // Phát hiện có người dùng số này rồi!
         }
         current = current->next;
@@ -32,10 +32,10 @@ Customer* BankSystem::timKiemKhachHang(std::string maKH) {
     return nullptr; // Không tìm thấy
 }
 
-Account* BankSystem::timKiemTaiKhoan(std::string maTK) {
+Account* BankSystem::timKiemTaiKhoan(std::string soTK) {
     Node<Account>* current = danhSachTK.getHead();
     while (current != nullptr) {
-        if (current->data.getMaTK() == maTK) {
+        if (current->data.getSoTK() == soTK) {
             return &(current->data); 
         }
         current = current->next;
@@ -63,8 +63,8 @@ bool BankSystem::themKhachHang(std::string maKH, std::string hoTen, std::string 
 // 4. TẠO TÀI KHOẢN MỚI
 // ==========================================
 bool BankSystem::taoTaiKhoan(std::string soTK, std::string maKH, std::string maPIN, double soDuBanDau) {
-    if (kiemTraTrungSTK(maTK) == true) {
-        std::cout << "[LOI] So tai khoan " << maTK << " da co nguoi su dung!" << std::endl;
+    if (kiemTraTrungSTK(soTK) == true) {
+        std::cout << "[LOI] So tai khoan " << soTK << " da co nguoi su dung!" << std::endl;
         return false;
     }
 
@@ -81,6 +81,6 @@ bool BankSystem::taoTaiKhoan(std::string soTK, std::string maKH, std::string maP
     Account tkMoi(soTK, maKH, maPIN, soDuBanDau);
     danhSachTK.addTail(tkMoi);
     
-    std::cout << "[THANH CONG] Da tao tai khoan " << maTK << " cho khach hang " << maKH << std::endl;
+    std::cout << "[THANH CONG] Da tao tai khoan " << soTK << " cho khach hang " << maKH << std::endl;
     return true;
 }

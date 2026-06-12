@@ -8,7 +8,7 @@ Customer::Customer(){
    this->cccd = "N/A";
    this->sdt = "N/A"; 
 }
-Customer::Customer(std::string maKH, std::string hoTen, std::string cccd, std::string sdr){
+Customer::Customer(std::string maKH, std::string hoTen, std::string cccd, std::string sdt){
     this->maKH = maKH;
     this->hoTen = hoTen;
     this->cccd = cccd;

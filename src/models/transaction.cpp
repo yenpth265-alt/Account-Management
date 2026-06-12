@@ -38,6 +38,15 @@ std::string Transaction::getLoaiGD() const {
 double Transaction::getSoTien() const { 
     return this->soTien; 
 }
+// header có mà cpp ko thấy nma nhét 2 hàm này vào
+// lại thấy lỗi :))
+std::string Transaction::getSoTKGui() const {
+    return this->soTKGui;
+}
+std::string Transaction::getSoTKNhan() const {
+    return this->soTKNhan;
+}
+
 
 //3. Hàm sinh mã tự động
 std::string Transaction::sinhMaGD(int soThuTuMoi) {
