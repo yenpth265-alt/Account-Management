@@ -2,9 +2,9 @@
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
 
-#include <string>
+#include "include/services/BankSystem.h"
 
-void DocDuLieuTuFile(std::string tenFile);
-void LuuDuLieuVaoFile(std::string tenFile);
+void LoadAllData(BankSystem& bank);
+void SaveAllData(BankSystem& bank);
 
 #endif
