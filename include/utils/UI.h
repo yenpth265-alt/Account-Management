@@ -2,8 +2,8 @@
 #ifndef UI_H
 #define UI_H
 
-#include "include/services/BankSystem.h"
-#include "include/services/TransactionLogic.h"
+#include "../services/BankSystem.h"
+#include "../services/TransactionLogic.h"
 
 // Các hàm hỗ trợ điều hướng
 void XoaManHinh();
