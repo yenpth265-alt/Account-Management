@@ -3,6 +3,10 @@
 #include <ctime>
 #include <cstdio>
 
+BankSystem* TransactionLogic::getBankSystem() {
+    return this->bankSystem;
+}
+
 TransactionLogic::TransactionLogic(BankSystem* bank){
     this->bankSystem = bank;
     this->soGDDaTao = 0;

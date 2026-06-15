@@ -24,23 +24,6 @@ static int TinhSoThangGui(const std::string& ngayMo, const std::string& ngayHien
     return (soThang > 0) ? soThang : 0;
 }
 
-// xem toàn bộ lịch sử giao dịch
-void ReportLogic::XemLichSuToanHeThong(){
-    LinkedList<Transaction>& dsGD = this->bankSystem->getDanhSachGD();
-
-    if(dsGD.getSize() == 0){
-        std::cout << "[THONG BAO] He thong chua co giao dich nao!" << std:: endl;
-        return;
-    }
-    std::cout << "LICH SU GIAO DICH TOAN HE THONG (" 
-              << dsGD.getSize() << " giao dich ) " << std::endl;
-    
-    Node<Transaction>* current = dsGD.getHead();
-    while (current != NULL) {
-        current->data.xuatThongTin();
-        current = current->next;
-    }
-}
 //XEM LICH SU THEO TAI KHOAN
 void ReportLogic::XemLichSuTheoTK(std::string soTK){
     Account* tk = this->bankSystem->timKiemTaiKhoan(soTK);
@@ -79,46 +62,39 @@ void ReportLogic::XemSaoKe(std::string soTK){
     std::cout << "\nChi tiet giao dich:" << std::endl;
     XemLichSuTheoTK(soTK);
 }
-
-//THỐNG KÊ TỔNG GIAO DỊCH THEO LOẠI
-void ReportLogic::ThongKeTongGiaoDich() {
-    LinkedList<Transaction>& dsGD = this->bankSystem->getDanhSachGD();
- 
-    double tongNap = 0;
-    double tongRut = 0;
-    double tongChuyen = 0;
- 
-    int soGDNap = 0;
-    int soGDRut = 0;
-    int soGDChuyen = 0;
- 
-    Node<Transaction>* current = dsGD.getHead();
-    while (current != NULL) {
-        std::string loai = current->data.getLoaiGD();
-        double soTien = current->data.getSoTien();
- 
-        if (loai == "NAP") {
-            tongNap += soTien;
-            soGDNap++;
-        } else if (loai == "RUT") {
-            tongRut += soTien;
-            soGDRut++;
-        } else if (loai == "CHUYEN_KHOAN") {
-            tongChuyen += soTien;
-            soGDChuyen++;
-        }
- 
-        current = current->next;
-    }
- 
-    std::cout << "===== THONG KE GIAO DICH TOAN HE THONG =====" << std::endl;
-    std::cout << "- Nap tien    : " << soGDNap << " giao dich, tong "
-              << std::fixed << tongNap << " VND" << std::endl;
-    std::cout << "- Rut tien    : " << soGDRut << " giao dich, tong "
-              << std::fixed << tongRut << " VND" << std::endl;
-    std::cout << "- Chuyen khoan: " << soGDChuyen << " giao dich, tong "
-              << std::fixed << tongChuyen << " VND" << std::endl;
+// Hàm chuyển dd/mm/yyyy sang int dạng yyyymmdd để so sánh
+int ChuyenNgaySangInt(std::string ngay) {
+    int d, m, y;
+    sscanf(ngay.c_str(), "%d/%d/%d", &d, &m, &y);
+    return y * 10000 + m * 100 + d;
 }
+
+void ReportLogic::XemSaoKeTheoKhoangThoiGian(std::string soTK, std::string tuNgay, std::string denNgay) {
+    LinkedList<Transaction>& dsGD = this->bankSystem->getDanhSachGD();
+    Node<Transaction>* curr = dsGD.getHead();
+    
+    int start = ChuyenNgaySangInt(tuNgay);
+    int end = ChuyenNgaySangInt(denNgay);
+    bool coGiaoDich = false;
+
+    std::cout << "\n--- SAO KE TU " << tuNgay << " DEN " << denNgay << " ---" << std::endl;
+    
+    while (curr != NULL) {
+        // Lấy ngày giao dịch từ chuỗi "dd/mm/yyyy hh:mm"
+        std::string ngayGD = curr->data.getThoiGian().substr(0, 10);
+        int dateInt = ChuyenNgaySangInt(ngayGD);
+
+        if ((curr->data.getSoTKGui() == soTK || curr->data.getSoTKNhan() == soTK) 
+            && dateInt >= start && dateInt <= end) {
+            curr->data.xuatThongTin();
+            coGiaoDich = true;
+        }
+        curr = curr->next;
+    }
+    
+    if (!coGiaoDich) std::cout << "Khong co giao dich nao trong khoang thoi gian nay." << std::endl;
+}
+
 double ReportLogic::TinhLaiThang(std::string soTK, double laiSuatNamPhanTram) {
     // Tìm tài khoản
     Account* tk = this->bankSystem->timKiemTaiKhoan(soTK);
