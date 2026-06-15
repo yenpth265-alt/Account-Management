@@ -9,6 +9,7 @@ int main(){
   // Khởi tạo đối tượng
   BankSystem bank;
   TransactionLogic trans(&bank);
+  ReportLogic report(&bank);
 
   // Nạp dữ liệu từ file vào hệ thống
   LoadAllData(bank);
@@ -17,7 +18,7 @@ int main(){
   trans.SetSoGDDaTao(bank.getDanhSachGD().getSize());
 
   // Chạy giao diện
-  MenuChinh(bank, trans);
+  MenuChinh(bank, trans, report);
 
   // Lưu dữ liệu lại vào file
   SaveAllData(bank);
