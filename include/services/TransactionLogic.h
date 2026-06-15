@@ -14,6 +14,8 @@ class TransactionLogic {
         void GhiNhanGiaoDich(std::string loaiGD, double soTien,
                             std::string soTKGui, std::string soTKNhan);
     public:
+        BankSystem* getBankSystem();
+            
         TransactionLogic(BankSystem* bank);
 
         //đồng bộ số GD đã tạo khi load dữ liệu cũ từ file,tránh sinh trùng mã GD
