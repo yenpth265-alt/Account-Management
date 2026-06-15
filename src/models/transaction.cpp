@@ -1,4 +1,4 @@
-#include "models/Transaction.h"
+#include "../../include/models/transaction.h"
 #include <iostream>
 #include <string>
 
@@ -38,6 +38,15 @@ std::string Transaction::getLoaiGD() const {
 double Transaction::getSoTien() const { 
     return this->soTien; 
 }
+// header có mà cpp ko thấy nma nhét 2 hàm này vào
+// lại thấy lỗi :))
+std::string Transaction::getSoTKGui() const {
+    return this->soTKGui;
+}
+std::string Transaction::getSoTKNhan() const {
+    return this->soTKNhan;
+}
+
 
 //3. Hàm sinh mã tự động
 std::string Transaction::sinhMaGD(int soThuTuMoi) {
@@ -55,10 +64,10 @@ void Transaction::xuatThongTin() const {
               << " | So tien: " << std::fixed << this->soTien << " VND";
 
     //Nếu là gd ckhoan thì in thêm người nhận
-    if (this->loaiGD == "CHUYEN_KHOAN" && this->maTKDich != "N/A") {
+    if (this->loaiGD == "CHUYEN_KHOAN" && this->soTKNhan != "N/A") {
         std::cout << " | Tu TK: " << this->soTKGui << " -> Den TK: " << this->soTKNhan;
     } else {
-        std::cout << " | TK: " << this->soTK;
+        std::cout << " | TK: " << this->soTKGui;
     }
     
     std::cout << std::endl;

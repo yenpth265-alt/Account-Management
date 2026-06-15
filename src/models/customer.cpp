@@ -1,9 +1,9 @@
-#include "models/customer.h"
+#include "../../include/models/customer.h"
 #include <iostream>
 
 //triển khai hàm khởi tạo
 Customer::Customer(){
-   this->maKh = "CHUA_CO";
+   this->maKH = "CHUA_CO";
    this->hoTen = "Chua cap nhat";
    this->cccd = "N/A";
    this->sdt = "N/A"; 
