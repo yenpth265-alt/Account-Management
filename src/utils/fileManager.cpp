@@ -75,7 +75,7 @@ void SaveAllData(BankSystem& bank) {
     Node<Account>* currTK = bank.getDanhSachTK().getHead();
     while (currTK != NULL) {
         fileTK << currTK->data.getSoTK() << "|" << currTK->data.getMaKH() << "|" 
-               << currTK->data.getMaPIN() << "|" << currTK->data.getSoDu() << "|"
+               << currTK->data.getMaPIN() << "|" << (long long)currTK->data.getSoDu() << "|"
                << currTK->data.getNgayMo() << endl; 
         currTK = currTK->next;
     }

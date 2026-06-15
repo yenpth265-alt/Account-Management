@@ -1,5 +1,6 @@
 # include "../../include/utils/UI.h"
 # include "../../include/utils/fileManager.h"
+#include "../../include/services/ReportLogic.h"
 # include <iostream>
 # include <limits>
 
@@ -30,14 +31,14 @@ double NhapSoTien(){
     return soTien;
 }
 
-void MenuChinh(BankSystem& bank, TransactionLogic& trans){
+void MenuChinh(BankSystem& bank, TransactionLogic& trans, ReportLogic& report){
     int luaChon;
     do {
         XoaManHinh();
         cout << "=== HE THONG QUAN LY NGAN HANG ===" << endl;
         cout << "1. Quan ly Khach hang & Tai khoan" << endl;
         cout << "2. Giao dich (Nap/Rut/Chuyen khoan)" << endl;
-        cout << "3. Bao cao & Sao ke" << endl;
+        cout << "3. Bao cao, Sao ke, Tinh lai" << endl;
         cout << "0. Thoat chuong trinh" << endl;
         cout << "Nhap lua chon: ";
         cin >> luaChon;
@@ -45,7 +46,7 @@ void MenuChinh(BankSystem& bank, TransactionLogic& trans){
         switch(luaChon) {
             case 1: MenuQuanLy(bank); break;
             case 2: MenuGiaoDich(trans); break;
-            case 3: MenuBaoCao(bank); break;
+            case 3: MenuBaoCao(bank, report); break;
             case 0: cout << "Dang thoat..." << endl; break;
             default: cout << "Lua chon sai!" << endl; DungManHinh();
         }
@@ -101,23 +102,29 @@ void MenuGiaoDich(TransactionLogic& trans) {
     string stk, pin, stkNhan; 
     double soTien;
 
+    cout << "Nhap STK: "; cin >> stk;
+    cout << "Nhap ma PIN: "; cin >> pin; // Yêu cầu nhập mã PIN trước
+
+    // Xác thực mã PIN trước khi thực hiện giao dịch nào
+    Account* tk = trans.getBankSystem()->timKiemTaiKhoan(stk);
+    if (tk == NULL || !tk->kiemTraPIN(pin)) {
+        cout << "[LOI] Tai khoan khong ton tai hoac sai ma PIN!" << endl;
+        DungManHinh();
+        return;
+    }
+
     switch(chon) {
         case 1: // Nạp tiền
-            cout << "Nhap STK: "; cin >> stk;
-            cout << "Nhap so tien: "; soTien = NhapSoTien();
+            cout << "Nhap so tien nap: "; soTien = NhapSoTien();
             trans.NapTien(stk, soTien);
             break;
 
         case 2: // Rút tiền
-            cout << "Nhap STK: "; cin >> stk;
-            cout << "Nhap ma PIN: "; cin >> pin;
-            cout << "Nhap so tien: "; soTien = NhapSoTien();
+            cout << "Nhap so tien rut: "; soTien = NhapSoTien();
             trans.RutTien(stk, pin, soTien);
             break;
 
         case 3: // Chuyển khoản
-            cout << "Nhap STK gui: "; cin >> stk;
-            cout << "Nhap ma PIN: "; cin >> pin;
             cout << "Nhap STK nhan: "; cin >> stkNhan;
             cout << "Nhap so tien: "; soTien = NhapSoTien();
             trans.ChuyenKhoan(stk, pin, stkNhan, soTien);
@@ -128,38 +135,50 @@ void MenuGiaoDich(TransactionLogic& trans) {
             break;
     }
     DungManHinh();
-}                   
-void MenuBaoCao(BankSystem& bank) {
+}        
+
+void MenuBaoCao(BankSystem& bank, ReportLogic& report) {
     XoaManHinh();
-    cout << "=== BAO CAO GIAO DICH ===" << endl;
-    cout << "1. Xem toan bo lich su giao dich" << endl;
-    cout << "2. Sao ke mot tai khoan" << endl;
+    cout << "=== MENU BAO CAO & SAO KE ===" << endl;
+    cout << "1. Xem sao ke tat ca giao dich cua tai khoan" << endl;
+    cout << "2. Xem sao ke theo khoang thoi gian" << endl;
+    cout << "3. Tinh lai suat tien gui" << endl;
+    cout << "0. Quay lai" << endl;
     cout << "Nhap lua chon: ";
     int chon; cin >> chon;
 
-    if (chon == 1) {
-        // Duyệt danh sách giao dịch
-        Node<Transaction>* curr = bank.getDanhSachGD().getHead();
-        if (curr == NULL) cout << "Chua co giao dich nao!" << endl;
-        while (curr != NULL) {
-            curr->data.xuatThongTin();
-            curr = curr->next;
+    if (chon == 0) return;
+
+    string stk;
+    cout << "Nhap STK: "; cin >> stk;
+
+    // Kiểm tra tài khoản tồn tại trước khi làm tiếp
+    if (bank.timKiemTaiKhoan(stk) == NULL) {
+        cout << "[LOI] Khong tim thay tai khoan " << stk << "!" << endl;
+        DungManHinh();
+        return;
+    }
+
+    switch(chon) {
+        case 1:
+            report.XemSaoKe(stk); // Gọi hàm có sẵn
+            break;
+        case 2: {
+            string tuNgay, denNgay;
+            cout << "Nhap ngay bat dau (dd/mm/yyyy): "; cin >> tuNgay;
+            cout << "Nhap ngay ket thuc (dd/mm/yyyy): "; cin >> denNgay;
+            report.XemSaoKeTheoKhoangThoiGian(stk, tuNgay, denNgay); // Bạn cần viết hàm này
+            break;
         }
-    } 
-    else if (chon == 2) {
-        string stk;
-        cout << "Nhap STK can sao ke: "; cin >> stk;
-        Node<Transaction>* curr = bank.getDanhSachGD().getHead();
-        bool found = false;
-        while (curr != NULL) {
-            // Kiểm tra nếu giao dịch liên quan đến STK đó
-            if (curr->data.getSoTKGui() == stk || curr->data.getSoTKNhan() == stk) {
-                curr->data.xuatThongTin();
-                found = true;
-            }
-            curr = curr->next;
+        case 3: {
+            double laiSuat;
+            cout << "Nhap lai suat nam (%): "; cin >> laiSuat;
+            double tienLai = report.TinhLaiThang(stk, laiSuat);
+            cout << "-> Tien lai du kien: " << tienLai << " VND" << endl;
+            break;
         }
-        if (!found) cout << "Tai khoan khong co giao dich nao!" << endl;
+        default:
+            cout << "Lua chon khong hop le!" << endl;
     }
     DungManHinh();
 }
