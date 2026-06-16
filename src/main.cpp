@@ -1,4 +1,5 @@
 # include <iostream>
+# include <iomanip>
 # include "../include/utils/UI.h"
 # include "../include/utils/fileManager.h"
 # include "../include/services/BankSystem.h"
@@ -6,6 +7,9 @@
 
 using namespace std;
 int main(){
+
+  cout << fixed;
+
   // Khởi tạo đối tượng
   BankSystem bank;
   TransactionLogic trans(&bank);

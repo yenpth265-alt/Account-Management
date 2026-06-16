@@ -51,7 +51,8 @@ bool TransactionLogic::NapTien(std::string soTK, double soTien){
     }
     // ghi nhận giao dịch: nạp tiền không có người nhận, để "N/A"
     GhiNhanGiaoDich("NAP", soTien, soTK, "N/A");
-    std::cout << "[THANH CONG] Da nap " << std::fixed << soTien << " VND vao tai khoan " << soTK << std::endl;
+    std::cout << "[THANH CONG] Da nap " << soTien << " VND vao tai khoan " << soTK 
+    << ". So du moi: " << tk->getSoDu() <<"VND" << std::endl;
     return true;
 }
 
@@ -77,8 +78,9 @@ bool TransactionLogic::RutTien(std::string soTK, std::string maPIN, double soTie
     }
     // ghi nhận giao dịch: rút tiền không có tk nhận -> để "N/A"
     GhiNhanGiaoDich("RUT", soTien, soTK, "N/A");
-    std::cout << "[THANH CONG] Da rut" << std::fixed << soTien 
-              << " VND tu tai khoan " << soTK << std::endl;
+    std::cout << "[THANH CONG] Da rut" <<  soTien 
+              << " VND tu tai khoan " << soTK
+              << ". So du con lai: " << tk->getSoDu() << "VND" << std::endl;
     return true;
 }
 // CHUYEN KHOAN
@@ -106,6 +108,12 @@ bool TransactionLogic::ChuyenKhoan(std::string soTKGui, std::string maPIN,
         return false;
     }
  
+    if (tkGui->rutTien(soTien) == false) {
+        std::cout << "[LOI] So du tai khoan " << soTKGui
+                  << " khong du! (Can giu lai toi thieu 50,000 VND)" << std::endl;
+        return false;
+    }
+
     if (tkGui->kiemTraPIN(maPIN) == false) {
         std::cout << "[LOI] Ma PIN khong dung!" << std::endl;
         return false;
@@ -123,7 +131,8 @@ bool TransactionLogic::ChuyenKhoan(std::string soTKGui, std::string maPIN,
     // ghi nhận giao dịch chuyển khoản
     GhiNhanGiaoDich("CHUYEN_KHOAN", soTien, soTKGui, soTKNhan);
  
-    std::cout << "[THANH CONG] Da chuyen " << std::fixed << soTien
-              << " VND tu " << soTKGui << " den " << soTKNhan << std::endl;
+    std::cout << "[THANH CONG] Da chuyen " << soTien
+              << " VND tu " << soTKGui << " den " << soTKNhan
+              << ". So du con lai TK gui: " << tkGui->getSoDu() << "VND" << std::endl;
     return true;
 }

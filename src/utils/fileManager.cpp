@@ -15,8 +15,11 @@ string getNextToken(stringstream& ss){
 }
 
 void LoadAllData (BankSystem& bank){
+string dummyLine; // biến tạm chứa dòng tiêu đề
+
     // Doc khach hang
     ifstream fileKH("data/customers.txt");
+    getline(fileKH, dummyLine); // bỏ qua dòng tiêu đề khi đọc
     string line;
     while (getline(fileKH, line)){
         stringstream ss(line);
@@ -31,6 +34,7 @@ void LoadAllData (BankSystem& bank){
 
     //Doc tai khoan
     ifstream fileTK("data/accounts.txt");
+    getline(fileTK, dummyLine);
     while (getline(fileTK, line)) {
         stringstream ss(line);
         string soTK = getNextToken(ss);
@@ -43,7 +47,8 @@ void LoadAllData (BankSystem& bank){
     }
     fileTK.close();
 
-    ifstream fileGD("data/transactions.txt");
+    ifstream fileGD(".data/transactions.txt");
+    getline(fileGD, dummyLine);
     while (getline(fileGD, line)) {
         stringstream ss(line);
         string maGD     = getNextToken(ss);
@@ -75,7 +80,7 @@ void SaveAllData(BankSystem& bank) {
     Node<Account>* currTK = bank.getDanhSachTK().getHead();
     while (currTK != NULL) {
         fileTK << currTK->data.getSoTK() << "|" << currTK->data.getMaKH() << "|" 
-               << currTK->data.getMaPIN() << "|" << (long long)currTK->data.getSoDu() << "|"
+               << currTK->data.getMaPIN() << "|" << currTK->data.getSoDu() << "|"
                << currTK->data.getNgayMo() << endl; 
         currTK = currTK->next;
     }

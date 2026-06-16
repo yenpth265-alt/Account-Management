@@ -73,7 +73,7 @@ bool Account::napTien(double soTien) {
 }
 //Hàm rút tiền
 bool Account::rutTien(double soTien) {
-    if(soTien > 0 && soTien <= this->soDu) {
+    if(soTien > 0 && (this->soDu - soTien) >= 50000.0) {
         this->soDu -= soTien;
         return true;
     }
@@ -83,6 +83,7 @@ bool Account::rutTien(double soTien) {
 void Account::xuatThongTin() const {
     std::cout << "STK: " << this->soTK 
               << " | Ma KH: " << this->maKH 
-              << " | So du: " << std::fixed << this->soDu << " VND" 
+              << " | So du: " << this->soDu << " VND" 
+              <<" | Ngay mo: " << this->ngayMo
               << std::endl;
 }

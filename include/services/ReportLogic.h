@@ -20,6 +20,7 @@ class ReportLogic {
     void XemSaoKeTheoKhoangThoiGian(std::string soTK, std::string tuNgay, std::string denNgay);
 
     // Thêm vào trong class ReportLogic
-    double TinhLaiThang(std::string soTK, double laiSuatNamPhanTram);
+    double TinhLaiThang(std::string soTK, double laiSuatNamPhanTram,
+                            int thangXem = 0, int namXem = 0);
 };
 #endif

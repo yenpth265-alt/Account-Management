@@ -61,7 +61,7 @@ void Transaction::xuatThongTin() const {
     std::cout << "[" << this->thoiGian << "] " 
               << "Ma GD: " << this->maGD 
               << " | Loai: " << this->loaiGD 
-              << " | So tien: " << std::fixed << this->soTien << " VND";
+              << " | So tien: " << this->soTien << " VND";
 
     //Nếu là gd ckhoan thì in thêm người nhận
     if (this->loaiGD == "CHUYEN_KHOAN" && this->soTKNhan != "N/A") {
