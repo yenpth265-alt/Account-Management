@@ -8,10 +8,14 @@ class ReportLogic {
         BankSystem* bankSystem; //con trỏ trỏ tới hệ thống ngân hàng đang chạy
     public:
         ReportLogic(BankSystem* bank);
+
+        std::string LayNgayHienTai();
+    int ChuyenNgaySangInt(const std::string& ngay);
     
     // In lịch sử giao dịch của 1 tk cụ thể
     // giao dịch nạp/rút/chuyển khoản của tk đó 
     void XemLichSuTheoTK(std::string soTK);
+    void TuDongChotLaiHangThang();
 
     // In sao kê (số dư hiện tại, danh sách giao dịch) cho 1 tk
     void XemSaoKe(std::string soTK);

@@ -3,31 +3,44 @@
 #include <ctime>
 #include <cstdio>
 
+using namespace std;
+
 ReportLogic::ReportLogic(BankSystem* bank){
     this->bankSystem = bank;
 }
 
-static std::string LayNgayHienTai() {
+string ReportLogic::LayNgayHienTai() {
     time_t now = time(0);
     tm* ltm = localtime(&now);
     char buf[20];
     sprintf(buf, "%02d/%02d/%04d", ltm->tm_mday, 1 + ltm->tm_mon, 1900 + ltm->tm_year);
-    return std::string(buf);
+    return string(buf);
 }
 
-static int ChuyenNgaySangInt(const std::string& ngay) {
+int ReportLogic::ChuyenNgaySangInt(const string& ngay) {
     int d, m, y;
     sscanf(ngay.c_str(), "%d/%d/%d", &d, &m, &y);
     return y * 10000 + m * 100 + d;
 }
 
-// Kiem tra thang T/Y da duoc tinh lai chua (co giao dich LAI trong thang do chua)
-static bool DaTinhLaiThang(LinkedList<Transaction>& dsGD,
-                            const std::string& soTK, int thang, int nam) {
+// Hàm phụ: Lấy số ngày của một tháng bất kỳ (có tính năm nhuận)
+static int LaySoNgayTrongThang(int thang, int nam) {
+    switch(thang) {
+        case 1: case 3: case 5: case 7: case 8: case 10: case 12: return 31;
+        case 4: case 6: case 9: case 11: return 30;
+        case 2: 
+            if ((nam % 4 == 0 && nam % 100 != 0) || (nam % 400 == 0)) return 29;
+            return 28;
+        default: return 0;
+    }
+}
+
+// Kiểm tra xem tháng này đã được chốt lãi chưa
+static bool DaTinhLaiThang(LinkedList<Transaction>& dsGD, const string& soTK, int thang, int nam) {
     Node<Transaction>* curr = dsGD.getHead();
     while (curr != NULL) {
         if (curr->data.getLoaiGD() == "LAI" && curr->data.getSoTKNhan() == soTK) {
-            std::string tg = curr->data.getThoiGian().substr(0, 10);
+            string tg = curr->data.getThoiGian().substr(0, 10);
             int d, m, y;
             sscanf(tg.c_str(), "%d/%d/%d", &d, &m, &y);
             if (m == thang && y == nam) return true;
@@ -37,9 +50,9 @@ static bool DaTinhLaiThang(LinkedList<Transaction>& dsGD,
     return false;
 }
 
-// Tinh tong tien lai da cong tu truoc den nay
-static double TinhTongLaiDaCong(LinkedList<Transaction>& dsGD, const std::string& soTK) {
-    double tong = 0.0;
+// Tính tổng tiền lãi từ lúc mở tài khoản
+static long long TinhTongLaiDaCong(LinkedList<Transaction>& dsGD, const string& soTK) {
+    long long tong = 0;
     Node<Transaction>* curr = dsGD.getHead();
     while (curr != NULL) {
         if (curr->data.getLoaiGD() == "LAI" && curr->data.getSoTKNhan() == soTK)
@@ -49,50 +62,48 @@ static double TinhTongLaiDaCong(LinkedList<Transaction>& dsGD, const std::string
     return tong;
 }
 
-// Tinh so du cua TK vao cuoi thang (thang/nam) bang cach di nguoc tu so du hien tai
-static double TinhSoDuCuoiThang(Account* tk, LinkedList<Transaction>& dsGD,
-                                  int thang, int nam) {
-    int thangNay = nam * 100 + thang;
-    double soDu  = tk->getSoDu();
-    std::string soTK = tk->getSoTK();
+// Tính số dư cuối ngày bằng cách đảo ngược thời gian từ hiện tại về quá khứ.
+// Dùng double ở đây vì là phép tính trung gian — kết quả trả về long long.
+static long long TinhSoDuCuoiNgay(Account* tk, LinkedList<Transaction>& dsGD, int d, int m, int y) {
+    int ngayMucTieu = y * 10000 + m * 100 + d;
+    double soDu = (double)tk->getSoDu(); // Bắt đầu từ số dư hiện tại
+    string soTK = tk->getSoTK();
 
     Node<Transaction>* curr = dsGD.getHead();
     while (curr != NULL) {
-        std::string tg = curr->data.getThoiGian().substr(0, 10);
-        int d, m, y;
-        sscanf(tg.c_str(), "%d/%d/%d", &d, &m, &y);
-        int thangGD = y * 100 + m;
+        string tg = curr->data.getThoiGian().substr(0, 10);
+        int dGD, mGD, yGD;
+        sscanf(tg.c_str(), "%d/%d/%d", &dGD, &mGD, &yGD);
+        int ngayGD = yGD * 10000 + mGD * 100 + dGD;
 
-        if (thangGD > thangNay) {
-            std::string loai  = curr->data.getLoaiGD();
-            double soTien     = curr->data.getSoTien();
-            std::string tkGui = curr->data.getSoTKGui();
-            std::string tkNhan= curr->data.getSoTKNhan();
+        // Nếu giao dịch diễn ra SAU ngày mục tiêu -> Trừ ngược lại để tìm số dư của quá khứ
+        if (ngayGD > ngayMucTieu) {
+            string loai = curr->data.getLoaiGD();
+            long long soTien = curr->data.getSoTien();
+            string tkGui = curr->data.getSoTKGui();
+            string tkNhan = curr->data.getSoTKNhan();
 
-            if (loai == "NAP"  && tkGui  == soTK) soDu -= soTien;
-            else if (loai == "RUT"  && tkGui  == soTK) soDu += soTien;
+            if (loai == "NAP" && tkGui == soTK) soDu -= soTien;
+            else if (loai == "RUT" && tkGui == soTK) soDu += soTien;
             else if (loai == "CHUYEN_KHOAN") {
-                if (tkGui  == soTK) soDu += soTien;
+                if (tkGui == soTK) soDu += soTien;
                 if (tkNhan == soTK) soDu -= soTien;
             }
             else if (loai == "LAI" && tkNhan == soTK) soDu -= soTien;
         }
         curr = curr->next;
     }
-    return soDu;
+    if (soDu < 0) soDu = 0;
+    return (long long)soDu;
 }
 
 // -------------------------------------------------------
-// XEM LICH SU GIAO DICH
+// XEM LỊCH SỬ VÀ SAO KÊ 
 // -------------------------------------------------------
-void ReportLogic::XemLichSuTheoTK(std::string soTK){
+void ReportLogic::XemLichSuTheoTK(string soTK){
     Account* tk = this->bankSystem->timKiemTaiKhoan(soTK);
-    if (tk == NULL){
-        std::cout << "[LOI] Khong tim thay tai khoan " << soTK << "!" << std::endl;
-        return;
-    }
+    if (tk == NULL) return;
     LinkedList<Transaction>& dsGD = this->bankSystem->getDanhSachGD();
-    std::cout << "LICH SU GIAO DICH CUA TAI KHOAN " << soTK << std::endl;
     int soGD = 0;
     Node<Transaction>* curr = dsGD.getHead();
     while (curr != NULL){
@@ -102,170 +113,191 @@ void ReportLogic::XemLichSuTheoTK(std::string soTK){
         }
         curr = curr->next;
     }
-    if (soGD == 0)
-        std::cout << "Tai khoan nay chua co giao dich nao." << std::endl;
+    if (soGD == 0) cout << "Tai khoan nay chua co giao dich nao." << endl;
 }
 
-// -------------------------------------------------------
-// SAO KE
-// -------------------------------------------------------
-void ReportLogic::XemSaoKe(std::string soTK){
+void ReportLogic::XemSaoKe(string soTK){
     Account* tk = this->bankSystem->timKiemTaiKhoan(soTK);
-    if (tk == NULL){
-        std::cout << "[LOI] Khong tim thay tai khoan " << soTK << std::endl;
-        return;
-    }
-    std::cout << "========================================" << std::endl;
-    std::cout << "       SAO KE TAI KHOAN: " << soTK        << std::endl;
-    std::cout << "========================================" << std::endl;
+    if (tk == NULL){ cout << "[LOI] Khong tim thay tai khoan " << soTK << endl; return; }
+    cout << "========================================" << endl;
+    cout << "       SAO KE TAI KHOAN: " << soTK        << endl;
+    cout << "========================================" << endl;
     tk->xuatThongTin();
-    std::cout << "\nChi tiet giao dich:" << std::endl;
+    cout << "\nChi tiet giao dich:" << endl;
     XemLichSuTheoTK(soTK);
-    std::cout << "========================================" << std::endl;
+    cout << "========================================" << endl;
 }
 
-void ReportLogic::XemSaoKeTheoKhoangThoiGian(std::string soTK,
-                                               std::string tuNgay,
-                                               std::string denNgay) {
+void ReportLogic::XemSaoKeTheoKhoangThoiGian(string soTK, string tuNgay, string denNgay) {
     Account* tk = this->bankSystem->timKiemTaiKhoan(soTK);
-    if (tk == NULL){
-        std::cout << "[LOI] Khong tim thay tai khoan " << soTK << std::endl;
-        return;
-    }
+    if (tk == NULL) return;
     LinkedList<Transaction>& dsGD = this->bankSystem->getDanhSachGD();
     int start = ChuyenNgaySangInt(tuNgay);
     int end   = ChuyenNgaySangInt(denNgay);
     bool co   = false;
 
-    std::cout << "========================================" << std::endl;
-    std::cout << "  SAO KE TU " << tuNgay << " DEN " << denNgay << std::endl;
-    std::cout << "  Tai khoan : " << soTK                        << std::endl;
-    std::cout << "========================================" << std::endl;
+    cout << "========================================" << endl;
+    cout << "  SAO KE TU " << tuNgay << " DEN " << denNgay << endl;
+    cout << "========================================" << endl;
 
     Node<Transaction>* curr = dsGD.getHead();
     while (curr != NULL) {
-        std::string ngayGD = curr->data.getThoiGian().substr(0, 10);
+        string ngayGD = curr->data.getThoiGian().substr(0, 10);
         int dateInt = ChuyenNgaySangInt(ngayGD);
-        if ((curr->data.getSoTKGui() == soTK || curr->data.getSoTKNhan() == soTK)
-            && dateInt >= start && dateInt <= end) {
+        if ((curr->data.getSoTKGui() == soTK || curr->data.getSoTKNhan() == soTK) && dateInt >= start && dateInt <= end) {
             curr->data.xuatThongTin();
             co = true;
         }
         curr = curr->next;
     }
-    if (!co)
-        std::cout << "Khong co giao dich nao trong khoang thoi gian nay." << std::endl;
-    std::cout << "========================================" << std::endl;
+    if (!co) cout << "Khong co giao dich nao trong khoang thoi gian nay." << endl;
+    cout << "========================================" << endl;
 }
 
 // -------------------------------------------------------
-// TINH LAI THANG CU THE
+// TÍNH LÃI CỘNG DỒN THEO NGÀY (4%/Năm)
 // -------------------------------------------------------
-// thang=0, nam=0 => thang hien tai
-double ReportLogic::TinhLaiThang(std::string soTK, double laiSuatNamPhanTram,
-                                   int thangXem, int namXem) {
+double ReportLogic::TinhLaiThang(string soTK, double laiSuatNamPhanTram, int thangXem, int namXem) {
     Account* tk = this->bankSystem->timKiemTaiKhoan(soTK);
-    if (tk == NULL) {
-        std::cout << "[LOI] Khong tim thay tai khoan " << soTK << "!" << std::endl;
-        return 0;
-    }
+    if (tk == NULL) return 0;
 
-    std::string ngayHienTai = LayNgayHienTai();
-    int dNow, mNow, yNow;
+    string ngayHienTai = LayNgayHienTai();
+    int dNow, mNow, yNow; 
     sscanf(ngayHienTai.c_str(), "%d/%d/%d", &dNow, &mNow, &yNow);
 
-    int dMo, mMo, yMo;
-    sscanf(tk->getNgayMo().c_str(), "%d/%d/%d", &dMo, &mMo, &yMo);
-    // Neus khong truyen thang cu the thi dung thang hien tai
     if (thangXem == 0) { thangXem = mNow; namXem = yNow; }
 
-    // Kiem tra thang xem co hop le khong (khong duoc truoc ngay mo TK)
-    int thangXemInt = namXem * 100 + thangXem;
-    int thangMoInt  = yMo    * 100 + mMo;
-    int thangNayInt = yNow   * 100 + mNow;
-
-    if (thangXemInt < thangMoInt) {
-        std::cout << "[LOI] Tai khoan dươc mo ngay: " << tk->getNgayMo() 
-                  << ". Thang:  " << thangXem << "/" << namXem << " chua co lai!" << std::endl;
-        return 0;
-    }
-    if (thangXemInt > thangNayInt) {
-        std::cout << "[LOI] Thang " << thangXem << "/" << namXem
-                  << " chua den!" << std::endl;
-        return 0;
+    int dMo, mMo, yMo; 
+    sscanf(tk->getNgayMo().c_str(), "%d/%d/%d", &dMo, &mMo, &yMo);
+    int ngayMoInt = yMo * 10000 + mMo * 100 + dMo;
+    int ngayNayInt = yNow * 10000 + mNow * 100 + dNow;
+    
+    LinkedList<Transaction>& dsGD = this->bankSystem->getDanhSachGD();
+    
+    // Kiểm tra xem đã chốt lãi tháng này chưa
+    if (DaTinhLaiThang(dsGD, soTK, thangXem, namXem)) {
+        cout << "\n[THONG BAO] Thang " << thangXem << "/" << namXem << " da duoc chot lai truoc do!" << endl;
+        return 0; 
     }
 
-    // Kiem tra da du 1 thang ke tu ngay mo TK chua
-    // Lai thang T/Y co neu: ngay hom nay >= ngay mo TK trong thang T/Y
-    // tuc la (T/Y > thang mo) VA (neu T/Y == thang hien tai thi dNow >= dMo)
-    bool duDieuKien = false;
-    if (thangXemInt < thangNayInt) {
-       // Thang da qua: chac chan du dieu kien neu thangXem > thangMo
-        duDieuKien = (thangXemInt > thangMoInt);
-    } else {
-        // Thang hien tai: can dNow >= dMo
-        duDieuKien = (thangXemInt > thangMoInt) && (dNow >= dMo);
+    int soNgayTrongThang = LaySoNgayTrongThang(thangXem, namXem);
+    double tongLaiThangNay = 0.0;
+    int soNgayTinhLai = 0;
+    
+    cout << "\n========================================" << endl;
+    cout << " BANG TINH LAI SUAT CHI TIET (" << thangXem << "/" << namXem << ")" << endl;
+    cout << "========================================" << endl;
+    cout << "Tai khoan    : " << soTK << endl;
+    cout << "Lai suat     : " << (long long)laiSuatNamPhanTram << "% / nam" << endl;
+    cout << "----------------------------------------" << endl;
+
+    // VÒNG LẶP QUÉT QUA TỪNG NGÀY TRONG THÁNG
+    for (int d = 1; d <= soNgayTrongThang; ++d) {
+        int loopDate = namXem * 10000 + thangXem * 100 + d;
+        
+        // Chỉ tính lãi cho những ngày từ lúc mở tài khoản đến hiện tại
+        if (loopDate >= ngayMoInt && loopDate <= ngayNayInt) {
+            long long soDuCuoiNgay = TinhSoDuCuoiNgay(tk, dsGD, d, thangXem, namXem);
+            // Công thức: Lãi 1 ngày = (Số dư * 4%) / 365
+            double laiNgay = (soDuCuoiNgay * (laiSuatNamPhanTram / 100.0)) / 365.0;
+            tongLaiThangNay += laiNgay;
+            soNgayTinhLai++;
+        }
     }
+
+    if (soNgayTinhLai == 0) {
+        cout << "[THONG BAO] Trong thang " << thangXem << "/" << namXem << ", tai khoan chua hoat dong!" << endl;
+        return 0;
+    }
+
+    cout << "So ngay tinh lai hop le: " << soNgayTinhLai << " ngay" << endl;
+    
+    //  đây là lãi Tạm Tính, chưa được cộng
+    cout << "Tien lai TAM TINH: " << (long long)tongLaiThangNay << " VND" << endl;
+
+    // Vẫn tính tổng lãi của các tháng trước (nếu có)
+    long long tongLaiTatCa = TinhTongLaiDaCong(dsGD, soTK);
+
+    cout << "----------------------------------------" << endl;
+    cout << "Tong lai da chot cac thang truoc: " << tongLaiTatCa << " VND" << endl;
+    cout << "So du hien tai (Chua gom lai tam tinh): " << tk->getSoDu() << " VND" << endl;
+    cout << "========================================" << endl;
+
+    return tongLaiThangNay;
+}
+// -------------------------------------------------------
+// TỰ ĐỘNG CHỐT LÃI KHI SANG THÁNG MỚI
+// -------------------------------------------------------
+void ReportLogic::TuDongChotLaiHangThang() {
+    string ngayHienTai = LayNgayHienTai();
+    int dNow, mNow, yNow;
+    sscanf(ngayHienTai.c_str(), "%d/%d/%d", &dNow, &mNow, &yNow);
+    int thangNayInt = yNow * 100 + mNow; // Ví dụ: 202606
 
     LinkedList<Transaction>& dsGD = this->bankSystem->getDanhSachGD();
-    double tongLaiCu = TinhTongLaiDaCong(dsGD, soTK);
+    Node<Account>* currTK = this->bankSystem->getDanhSachTK().getHead();
 
-    std::cout << std::endl;
-    std::cout << "========================================" << std::endl;
-    std::cout << "   TIEN LAI KHONG KY HAN - " << thangXem << "/" << namXem << std::endl;
-    std::cout << "========================================" << std::endl;
-    std::cout << "Tai khoan    : " << soTK                  << std::endl;
-    std::cout << "Ngay mo TK   : " << tk->getNgayMo()       << std::endl;
-    std::cout << "Lai suat     : " << laiSuatNamPhanTram    << "%/nam" << std::endl;
+    int soTKTKDuocCong = 0;
+    long long tongTienCong = 0;
 
-    if (!duDieuKien) {
-        std::cout << "----------------------------------------" << std::endl;
-        std::cout << "[THONG BAO] Chua du dieu kien tinh lai thang "
-                  << thangXem << "/" << namXem << "." << std::endl;
-        std::cout << "  (Can it nhat " << dMo << "/" << thangXem << "/" << namXem
-                  << " moi co lai)" << std::endl;
-        std::cout << "Tong lai da cong truoc do : " << tongLaiCu   << " VND" << std::endl;
-        std::cout << "So du hien tai            : " << tk->getSoDu() << " VND" << std::endl;
-        std::cout << "========================================" << std::endl;
-        return 0;
+    // Quét toàn bộ tài khoản trong hệ thống
+    while (currTK != NULL) {
+        Account* tk = &(currTK->data);
+        string soTK = tk->getSoTK();
+
+        int dMo, mMo, yMo;
+        sscanf(tk->getNgayMo().c_str(), "%d/%d/%d", &dMo, &mMo, &yMo);
+
+        int yLoop = yMo;
+        int mLoop = mMo;
+
+        // Vòng lặp kiểm tra từ tháng mở tài khoản đến TRƯỚC tháng hiện tại
+        while (true) {
+            int thangLoopInt = yLoop * 100 + mLoop;
+            if (thangLoopInt >= thangNayInt) break; // Chỉ tính cho các tháng đã qua
+
+            // Nếu tháng này chưa được cộng lãi -> Tính và cộng ngay!
+            if (!DaTinhLaiThang(dsGD, soTK, mLoop, yLoop)) {
+                int soNgay = LaySoNgayTrongThang(mLoop, yLoop);
+                double tongLai = 0.0; // double trung gian để cộng phần lẻ
+                int ngayMoInt = yMo * 10000 + mMo * 100 + dMo;
+
+                for (int d = 1; d <= soNgay; ++d) {
+                    int loopDate = yLoop * 10000 + mLoop * 100 + d;
+                    
+                    if (loopDate >= ngayMoInt) {
+                        long long soDuNgay = TinhSoDuCuoiNgay(tk, dsGD, d, mLoop, yLoop);
+                        tongLai += (soDuNgay * (4.0 / 100.0)) / 365.0; // Mặc định 4%/năm
+                    }
+                }
+
+                // Cộng tiền và ghi lịch sử giao dịch (chốt vào ngày cuối cùng của tháng đó)
+                if (tongLai > 0) {
+                    tk->napTien((long long)tongLai);
+                    
+                    int soGD = dsGD.getSize() + 1;
+                    string maGD = Transaction::sinhMaGD(soGD);
+                    char buf[30];
+                    sprintf(buf, "%02d/%02d/%04d 23:59", soNgay, mLoop, yLoop); 
+                    Transaction gdLai(maGD, string(buf), "LAI", (long long)tongLai, "NGAN_HANG", soTK);
+                    dsGD.addTail(gdLai);
+
+                    soTKTKDuocCong++;
+                    tongTienCong += (long long)tongLai;
+                }
+            }
+            
+            // Tăng lên tháng tiếp theo
+            mLoop++;
+            if (mLoop > 12) { mLoop = 1; yLoop++; }
+        }
+        currTK = currTK->next;
     }
 
-    // Da tinh lai thang nay chua
-    bool daTinh = DaTinhLaiThang(dsGD, soTK, thangXem, namXem);
-
-    // Tinh so du cuoi thang xem de lam can cu tinh lai
-    double soDuThang   = TinhSoDuCuoiThang(tk, dsGD, thangXem, namXem);
-    double laiSuatThang = laiSuatNamPhanTram / 100.0 / 12.0;
-    double laiThang    = soDuThang * laiSuatThang;
-
-    std::cout << "So du thang " << thangXem << "/" << namXem
-              << "  : " << soDuThang   << " VND" << std::endl;
-    std::cout << "Tien lai thang nay        : " << laiThang    << " VND" << std::endl;
-    std::cout << "----------------------------------------"               << std::endl;
-
-    if (daTinh) {
-        std::cout << "[DA TINH] Thang " << thangXem << "/" << namXem
-                  << " da duoc cong lai truoc do." << std::endl;
-    } else {
-        // Cong lai vao so du
-        tk->napTien(laiThang);
-
-        // Ghi giao dich loai "LAI"
-        int soGD = dsGD.getSize() + 1;
-        std::string maGD = Transaction::sinhMaGD(soGD);
-        char buf[30];
-        sprintf(buf, "%02d/%02d/%04d 00:00", dMo, thangXem, namXem);
-        Transaction gdLai(maGD, std::string(buf), "LAI", laiThang, "NGAN_HANG", soTK);
-        dsGD.addTail(gdLai);
-
-        tongLaiCu += laiThang; // Cap nhat tong
-        std::cout << "[THANH CONG] Da cong lai thang " << thangXem
-                  << "/" << namXem << " vao so du." << std::endl;
+    // Nếu có cộng lãi cho ai đó, in ra một thông báo nhỏ lúc bật app
+    if (soTKTKDuocCong > 0) {
+        cout << "[HE THONG] Phat hien " << soTKTKDuocCong << " tai khoan chua duoc chot lai cac thang truoc." << endl;
+        cout << "[HE THONG] Da tu dong quet va cong tong cong " <<(long long)tongTienCong << " VND tien lai vao cac tai khoan!" << endl;
+        cout << "----------------------------------------" << endl;
     }
-
-    std::cout << "Tong lai tu truoc den nay : " << tongLaiCu    << " VND" << std::endl;
-    std::cout << "So du hien tai            : " << tk->getSoDu() << " VND" << std::endl;
-    std::cout << "========================================" << std::endl;
-
-    return laiThang;
 }

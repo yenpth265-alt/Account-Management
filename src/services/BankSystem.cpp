@@ -2,6 +2,7 @@
 #include <iostream>
 #include <ctime>
 #include <cstdio>
+#include <string>
 
 static std::string LayNgayHienTai() {
     time_t now = time(0);
@@ -15,17 +16,24 @@ BankSystem::BankSystem() {
 }
 
 // ==========================================
-// 1. KIỂM TRA TRÙNG SỐ TÀI KHOẢN
+// 1. KIỂM TRA TRÙNG
 // ==========================================
 bool BankSystem::kiemTraTrungSTK(std::string soTK) {
     Node<Account>* current = danhSachTK.getHead();
     while (current != NULL) {
-        if (current->data.getSoTK() == soTK) {
-            return true; // Phát hiện có người dùng số này rồi!
-        }
+        if (current->data.getSoTK() == soTK) return true;
         current = current->next;
     }
-    return false; // Số tài khoản này an toàn
+    return false;
+}
+ 
+bool BankSystem::kiemTraTrungCCCD(std::string cccd) {
+    Node<Customer>* current = danhSachKH.getHead();
+    while (current != NULL) {
+        if (current->data.getCCCD() == cccd) return true;
+        current = current->next;
+    }
+    return false;
 }
 
 // ==========================================
@@ -65,14 +73,13 @@ bool BankSystem::themKhachHang(std::string maKH, std::string hoTen, std::string 
     Customer khMoi(maKH, hoTen, cccd, sdt);
     danhSachKH.addTail(khMoi);
     
-    std::cout << "[THANH CONG] Da them khach hang: " << hoTen << std::endl;
-    return true;
+   return true;
 }
 
 // ==========================================
 // 4. TẠO TÀI KHOẢN MỚI
 // ==========================================
-bool BankSystem::taoTaiKhoan(std::string soTK, std::string maKH, std::string maPIN, double soDuBanDau) {
+bool BankSystem::taoTaiKhoan(std::string soTK, std::string maKH, std::string maPIN, long long soDuBanDau) {
     if (kiemTraTrungSTK(soTK) == true) {
         std::cout << "[LOI] So tai khoan " << soTK << " da co nguoi su dung!" << std::endl;
         return false;
@@ -96,16 +103,75 @@ bool BankSystem::taoTaiKhoan(std::string soTK, std::string maKH, std::string maP
     std::cout << "[THANH CONG] Da tao tai khoan " << soTK << " cho khach hang " << maKH << std::endl;
     return true;
 }
-LinkedList<Transaction>& BankSystem::getDanhSachGD() {
-    return danhSachGD; // Trả về danh sách giao dịch mà bạn đã khai báo trong class
-}
+
 
 bool BankSystem::naptaiKhoanTuFile(std::string soTK, std::string maKH, 
-                                    std::string maPIN, double soDu, std::string ngayMo) {
+                                    std::string maPIN, long long soDu, std::string ngayMo) {
     if (kiemTraTrungSTK(soTK)) {
         return false; // tránh trùng STK nếu file bị lỗi
     }
     Account tk(soTK, maKH, maPIN, soDu, ngayMo);
     danhSachTK.addTail(tk);
     return true;
+}
+
+// ==========================================
+// GETTERS
+// ==========================================
+LinkedList<Transaction>& BankSystem::getDanhSachGD() {
+    return danhSachGD; 
+}
+LinkedList<Customer>&    BankSystem::getDanhSachKH() { 
+    return danhSachKH; 
+}
+
+// ==========================================
+// VALIDATION DỮ LIỆU ĐẦU VÀO
+// ==========================================
+
+
+bool BankSystem::kiemTraCCCDHopLe(const std::string& cccd) {
+    if (cccd.length() != 12) return false;
+    for (char c : cccd) {
+        if (c < '0' || c > '9') return false;
+    }
+    return true;
+}
+
+bool BankSystem::kiemTraPINHopLe(const std::string& pin) {
+    if (pin.length() != 4) return false;
+    for (char c : pin) {
+        if (c < '0' || c > '9') return false;
+    }
+    return true;
+}
+
+bool BankSystem::kiemTraSDTHopLe(const std::string& sdt) {
+    if (sdt.length() != 10) return false;
+    if (sdt[0] != '0') return false;
+    for (char c : sdt) {
+        if (c < '0' || c > '9') return false;
+    }
+    return true;
+}
+
+// ==========================================
+// SINH MÃ TỰ ĐỘNG
+// ==========================================
+std::string BankSystem::sinhMaKHMoi() {
+    int soKH = danhSachKH.getSize() + 1;
+    std::string maKH = Customer::sinhMaKH(soKH);
+    while (timKiemKhachHang(maKH) != NULL) {
+        soKH++;
+        maKH = Customer::sinhMaKH(soKH);
+    }
+    return maKH;
+}
+ 
+std::string BankSystem::sinhSTKMoi() {
+    srand((unsigned int)time(0));
+    std::string soTK = std::to_string(100000000 + rand() % 900000000);
+    while (kiemTraTrungSTK(soTK))
+        soTK = std::to_string(100000000 + rand() % 900000000);
+    return soTK;
 }

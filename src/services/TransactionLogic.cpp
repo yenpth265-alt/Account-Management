@@ -16,7 +16,7 @@ void TransactionLogic::SetSoGDDaTao(int soGD){
     this->soGDDaTao = soGD;
 }
 // HÀM PHỤ: GHI NHẬN GIAO DỊCH
-void TransactionLogic::GhiNhanGiaoDich(std::string loaiGD, double soTien, std::string soTKGui, std::string soTKNhan){
+void TransactionLogic::GhiNhanGiaoDich(std::string loaiGD, long long soTien, std::string soTKGui, std::string soTKNhan){
     this->soGDDaTao++;
 
     std::string maGD = Transaction::sinhMaGD(this->soGDDaTao);
@@ -34,7 +34,7 @@ void TransactionLogic::GhiNhanGiaoDich(std::string loaiGD, double soTien, std::s
 }
 
 // NẠP TIỀN
-bool TransactionLogic::NapTien(std::string soTK, double soTien){
+bool TransactionLogic::NapTien(std::string soTK, long long soTien){
     if (soTien <= 0){
         std::cout << "[LOI] So tien nap phai lon hon 0!" << std::endl;
         return false;
@@ -57,7 +57,7 @@ bool TransactionLogic::NapTien(std::string soTK, double soTien){
 }
 
 // RÚT TIỀN
-bool TransactionLogic::RutTien(std::string soTK, std::string maPIN, double soTien){
+bool TransactionLogic::RutTien(std::string soTK, std::string maPIN, long long soTien){
     if (soTien <=0){
         std::cout <<"[LOI] So tien rut phai lon hon 0!" << std::endl;
         return false;
@@ -85,7 +85,7 @@ bool TransactionLogic::RutTien(std::string soTK, std::string maPIN, double soTie
 }
 // CHUYEN KHOAN
 bool TransactionLogic::ChuyenKhoan(std::string soTKGui, std::string maPIN,
-                                    std::string soTKNhan, double soTien) {
+                                    std::string soTKNhan, long long soTien) {
     if (soTien <= 0) {
         std::cout << "[LOI] So tien chuyen phai lon hon 0!" << std::endl;
         return false;
@@ -105,12 +105,6 @@ bool TransactionLogic::ChuyenKhoan(std::string soTKGui, std::string maPIN,
     Account* tkNhan = this->bankSystem->timKiemTaiKhoan(soTKNhan);
     if (tkNhan == NULL) {
         std::cout << "[LOI] Khong tim thay tai khoan nhan " << soTKNhan << "!" << std::endl;
-        return false;
-    }
- 
-    if (tkGui->rutTien(soTien) == false) {
-        std::cout << "[LOI] So du tai khoan " << soTKGui
-                  << " khong du! (Can giu lai toi thieu 50,000 VND)" << std::endl;
         return false;
     }
 

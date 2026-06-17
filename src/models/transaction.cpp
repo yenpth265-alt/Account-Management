@@ -15,7 +15,7 @@ Transaction::Transaction(){
 Transaction::Transaction(std::string maGD, 
                 std::string thoiGian, 
                 std::string loaiGD,
-                double soTien, std::string soTKGui ,
+                long long soTien, std::string soTKGui ,
                 std::string soTKNhan) {
     this->maGD = maGD;
     this->thoiGian = thoiGian;
@@ -35,7 +35,7 @@ std::string Transaction::getThoiGian() const {
 std::string Transaction::getLoaiGD() const { 
     return this->loaiGD; 
 }
-double Transaction::getSoTien() const { 
+long long Transaction::getSoTien() const { 
     return this->soTien; 
 }
 // header có mà cpp ko thấy nma nhét 2 hàm này vào

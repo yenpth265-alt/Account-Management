@@ -8,28 +8,30 @@ class Account {
         std::string soTK;
         std::string maKH;
         std::string maPIN;
-        double soDu;
+        long long soDu;
         std::string ngayMo;
     public:
         //hàm khởi tạo
         Account();
         Account(std::string soTK, std::string maKH, 
-                std::string maPIN, double soDu, std::string ngayMo);
+                std::string maPIN, long long soDu, std::string ngayMo);
         
         //lấy dữ liệu
         std::string getSoTK() const;
         std::string getMaKH() const;
-        std::string getMaPIN() const { return maPIN; }
-        double getSoDu() const;
+        long long getSoDu() const;
         std::string getNgayMo() const;
         
         //cập nhật dữ liệu
         bool kiemTraPIN(std::string pinNhapVao) const;
         bool doiPIN(std::string pinCu, 
                     std::string pinMoi);
-        bool napTien(double soTien);
-        bool rutTien(double soTien);
+        bool napTien(long long soTien);
+        bool rutTien(long long soTien);
         void xuatThongTin() const;
+
+        // Cho phép hàm lưu file truy cập PIN để ghi ra đĩa (không public ra ngoài)
+        friend void SaveAllData(class BankSystem& bank);
 };
 
 #endif 

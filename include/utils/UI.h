@@ -8,7 +8,7 @@
 // Các hàm hỗ trợ điều hướng
 void XoaManHinh();
 void DungManHinh();
-double NhapSoTien();
+long long NhapSoTien();
 
 // Các hàm hiển thị menu có truyền tham số hệ thống
 void MenuChinh(BankSystem& bank, TransactionLogic& trans, ReportLogic& report);      // Menu tổng quát

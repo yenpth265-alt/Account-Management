@@ -25,7 +25,7 @@ Account::Account(){
 
 //Hàm khởi tạo khi có tham số
 Account::Account(std::string soTK, std::string maKH, 
-                std::string maPIN, double soDu, std::string ngayMo){
+                std::string maPIN, long long soDu, std::string ngayMo){
         this->soTK = soTK;
         this->maKH = maKH;
         this->maPIN = maPIN;
@@ -41,7 +41,7 @@ std::string Account::getSoTK() const {
 std::string Account::getMaKH() const {
     return this->maKH;
 }
-double Account::getSoDu() const {
+long long Account::getSoDu() const {
     return this->soDu; 
 }
 std::string Account::getNgayMo() const{
@@ -64,7 +64,7 @@ bool Account::doiPIN(std::string pinCu, std::string pinMoi){
     return false;
 }
 //Hàm nạp tiền : số tiền nạp > 0
-bool Account::napTien(double soTien) {
+bool Account::napTien(long long soTien) {
     if (soTien > 0){
         this->soDu += soTien;
         return true;
@@ -72,7 +72,7 @@ bool Account::napTien(double soTien) {
     return false;
 }
 //Hàm rút tiền
-bool Account::rutTien(double soTien) {
+bool Account::rutTien(long long soTien) {
     if(soTien > 0 && (this->soDu - soTien) >= 50000.0) {
         this->soDu -= soTien;
         return true;

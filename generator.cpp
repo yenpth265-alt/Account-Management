@@ -84,7 +84,7 @@ int main() {
         listSoTK.push_back(soTK);
         string maKH = listMaKH[dist_kh(gen)];
         string maPIN = to_string(dist_pin(gen));
-        double soDu = dist_sodu(gen);
+        long long soDu = dist_sodu(gen);
         
         // Format ngày tháng: dd/mm/yyyy
         ostringstream ngayMo;
@@ -125,7 +125,7 @@ int main() {
                  << setw(2) << dist_gio(gen) << ":" << setw(2) << dist_phut(gen);
                  
         string loaiGD = loaiGiaoDich[dist_loai(gen)];
-        double soTien = dist_sotien_gd(gen);
+        long long soTien = dist_sotien_gd(gen);
         
         string soTKGui = listSoTK[dist_tk(gen)];
         string soTKNhan = "N/A";
