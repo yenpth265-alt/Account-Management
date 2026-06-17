@@ -61,6 +61,7 @@ void MenuQuanLy(BankSystem& bank){
     cout << "   QUAN LY KHACH HANG & TAI KHOAN      " << endl;
     cout << "========================================" << endl;
     cout << "  1. Dang ky Khach hang & Tao Tai khoan " << endl;
+    cout << "  2. Doi ma PIN tai khoan               " << endl;
     cout << "  0. Quay lai                           " << endl;
     cout << "========================================" << endl;
     cout << "Nhap lua chon: ";
@@ -105,13 +106,10 @@ void MenuQuanLy(BankSystem& bank){
 
             cout << "Nhap so du ban dau (toi thieu 50,000 VND): "; soDu = NhapSoTien();
 
-            // 2. Tự động sinh mã Khách hàng
             string maKH = bank.sinhMaKHMoi();
 
-            // 3. Tự động sinh Số tài khoản 
             string soTK = bank.sinhSTKMoi();
 
-            // 4. Lưu vào hệ thống BankSystem
             bank.themKhachHang(maKH, ten, cccd, sdt);
             bank.taoTaiKhoan(soTK, maKH, maPIN, soDu);
             
@@ -119,8 +117,35 @@ void MenuQuanLy(BankSystem& bank){
             cout << "=> MA KHACH HANG cua ban : " << maKH << endl;
             cout << "=> SO TAI KHOAN cua ban  : " << soTK << " (Vui long ghi nho!)" << endl;
             
-            // 5. Ghi ngay xuống file text (Lưu tức thì)
             SaveAllData(bank); 
+            break;
+        }
+        case 2: { 
+            string stk, pinCu, pinMoi, xacNhanPin;
+            cout << "--- DOI MA PIN TAI KHOAN ---" << endl;
+            cout << "Nhap So tai khoan: "; cin >> stk;
+
+            Account* tk = bank.timKiemTaiKhoan(stk);
+            if (tk == NULL) {
+                cout << "[LOI] Khong tim thay tai khoan " << stk << "!" << endl;
+                break;
+            }
+
+            cout << "Nhap ma PIN hien tai: "; cin >> pinCu;
+            cout << "Nhap ma PIN moi (4 so): "; cin >> pinMoi;
+            cout << "Xac nhan ma PIN moi: "; cin >> xacNhanPin;
+
+            if (pinMoi != xacNhanPin) {
+                cout << "[LOI] Ma PIN xac nhan khong khop voi ma PIN moi!" << endl;
+                break;
+            }
+
+            if (tk->doiPIN(pinCu, pinMoi)) {
+                cout << "[THANH CONG] Da doi ma PIN cho tai khoan " << stk << "!" << endl;
+                SaveAllData(bank); 
+            } else {
+                cout << "[LOI] Ma PIN hien tai khong dung! Thao tac that bai." << endl;
+            }
             break;
         }
         case 0: 
