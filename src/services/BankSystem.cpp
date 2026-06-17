@@ -175,3 +175,19 @@ std::string BankSystem::sinhSTKMoi() {
         soTK = std::to_string(100000000 + rand() % 900000000);
     return soTK;
 }
+
+bool BankSystem::kiemTraNgayHopLe(const std::string& ngay) {
+    int d, m, y;
+    if (sscanf(ngay.c_str(), "%d/%d/%d", &d, &m, &y) != 3) return false;
+    if (y < 1900 || y > 3000) return false;
+    if (m < 1 || m > 12) return false;
+
+    int soNgayTrongThang = 31;
+    if (m == 4 || m == 6 || m == 9 || m == 11) {
+        soNgayTrongThang = 30;
+    } else if (m == 2) {
+        if ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0)) soNgayTrongThang = 29;
+        else soNgayTrongThang = 28;
+    }
+    return (d >= 1 && d <= soNgayTrongThang);
+}

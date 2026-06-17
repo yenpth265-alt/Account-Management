@@ -21,6 +21,7 @@ class BankSystem {
         static bool kiemTraCCCDHopLe(const std::string& cccd);   // Phải đúng 12 chữ số
         static bool kiemTraPINHopLe(const std::string& pin);      // Phải đúng 4 chữ số
         static bool kiemTraSDTHopLe(const std::string& sdt);      // Phải 10 chữ số, bắt đầu 0
+        static bool kiemTraNgayHopLe(const std::string& ngay);
         
         std::string sinhMaKHMoi();   // Sinh mã KH tự động
         std::string sinhSTKMoi();    // Sinh STK ngẫu nhiên, không trùng

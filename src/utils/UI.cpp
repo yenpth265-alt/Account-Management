@@ -104,19 +104,30 @@ void MenuQuanLy(BankSystem& bank){
                 }
             }
 
-            cout << "Nhap so du ban dau (toi thieu 50,000 VND): "; soDu = NhapSoTien();
-
+            while (true){
+                cout << "Nhap so du ban dau (toi thieu 50,000 VND): ";
+                soDu = NhapSoTien();
+                if (soDu < 50000){
+                    cout << "[LOI] So du ban dau phai >= 50,000 VND. Vui long nhap lai!" << endl;
+                } else {
+                    break;
+                }
+            }
             string maKH = bank.sinhMaKHMoi();
-
             string soTK = bank.sinhSTKMoi();
 
-            bank.themKhachHang(maKH, ten, cccd, sdt);
-            bank.taoTaiKhoan(soTK, maKH, maPIN, soDu);
-            
-            cout << "\n[THANH CONG] Da dang ky & tao tai khoan thanh cong!" << endl;
-            cout << "=> MA KHACH HANG cua ban : " << maKH << endl;
-            cout << "=> SO TAI KHOAN cua ban  : " << soTK << " (Vui long ghi nho!)" << endl;
-            
+            if (bank.themKhachHang(maKH, ten, cccd, sdt)) {
+                if (bank.taoTaiKhoan(soTK, maKH, maPIN, soDu)) {
+                    cout << "\n[THANH CONG] Da dang ky & tao tai khoan thanh cong!" << endl;
+                    cout << "=> MA KHACH HANG cua ban : " << maKH << endl;
+                    cout << "=> SO TAI KHOAN cua ban  : " << soTK << " (Vui long ghi nho!)" << endl;
+                    SaveAllData(bank); 
+                } else {
+                    cout << "\n[LOI] Tao tai khoan that bai!" << endl;
+                }
+            } else {
+                cout << "\n[LOI] Them khach hàng that bai!" << endl;
+            }
             SaveAllData(bank); 
             break;
         }
@@ -216,9 +227,12 @@ void MenuGiaoDich(TransactionLogic& trans) {
                     break;
                 }
                  
-                cout << "Nhap lai so tien (0 de huy): ";
+                cout << "Ban co muon thu lai khong? (Nhap so bat ky de TIEP TUC, go 0 de HUY): ";
                 long long retry; cin >> retry;
-                if (retry == 0) { cout << "Da huy thao tac." << endl; break; }
+                if (retry == 0) { 
+                    cout << "Da huy thao tac." << endl; 
+                    break; 
+                }
             }
             break;;
         }
@@ -238,24 +252,38 @@ void MenuGiaoDich(TransactionLogic& trans) {
                 break;
             }
 
-            string stkNhan;
-            cout << "Nhap STK nhan: "; cin >> stkNhan;
-            if (trans.getBankSystem()->timKiemTaiKhoan(stkNhan) == NULL) {
-                cout << "[LOI] Khong tim thay tai khoan nhan " << stkNhan << "!" << endl;
-                break;
-            }
-
             while (true) {
+                string stkNhan;
+                cout << "Nhap STK nhan: "; cin >> stkNhan;
+
+                if (stk == stkNhan) {
+                    cout << "[LOI] Khong the chuyen khoan cho chinh minh!" << endl;
+                    cout << "Ban co muon thu lai khong? (Nhap so bat ky de TIEP TUC, go 0 de HUY): ";
+                    long long retry; cin >> retry;
+                    if (retry == 0) { cout << "--> Da huy thao tac chuyen khoan." << endl; break; }
+                    continue; 
+                }
+
+                if (trans.getBankSystem()->timKiemTaiKhoan(stkNhan) == NULL) {
+                    cout << "[LOI] Khong tim thay tai khoan nhan " << stkNhan << "!" << endl;
+                    cout << "Ban co muon thu lai khong? (Nhap so bat ky de TIEP TUC, go 0 de HUY): ";
+                    long long retry; cin >> retry;
+                    if (retry == 0) { cout << "--> Da huy thao tac chuyen khoan." << endl; break; }
+                    continue; 
+                }
+
                 cout << "So du hien tai: " << tk->getSoDu() << " VND" << endl;
                 cout << "Nhap so tien chuyen: ";
                 long long soTien = NhapSoTien();
+
                 if (trans.ChuyenKhoan(stk, pin, stkNhan, soTien)) {
                     SaveAllData(*(trans.getBankSystem()));
-                    break;
+                    break; 
                 }
-                cout << "Nhap lai so tien (0 de huy): ";
+                
+                cout << "Ban co muon thu lai khong? (Nhap so bat ky de TIEP TUC, go 0 de HUY): ";
                 long long retry; cin >> retry;
-                if (retry == 0) { cout << "Da huy thao tac." << endl; break; }
+                if (retry == 0) { cout << "--> Da huy thao tac chuyen khoan." << endl; break; }
             }
             break;
         }
@@ -298,9 +326,19 @@ void MenuBaoCao(BankSystem& bank, ReportLogic& report) {
             
         case 2: {
             string tuNgay, denNgay;
-            cout << "Nhap ngay bat dau (dd/mm/yyyy): "; cin >> tuNgay;
-            cout << "Nhap ngay ket thuc (dd/mm/yyyy): "; cin >> denNgay;
+            while (true) {
+                cout << "Nhap ngay bat dau (dd/mm/yyyy): "; cin >> tuNgay;
+                if (!BankSystem::kiemTraNgayHopLe(tuNgay)) {
+                    cout << "[LOI] Dinh dang ngay khong ton tai tren lich! Vui long nhap lai." << endl;
+                } else break;
+            }
             
+            while (true) {
+                cout << "Nhap ngay ket thuc (dd/mm/yyyy): "; cin >> denNgay;
+                if (!BankSystem::kiemTraNgayHopLe(denNgay)) {
+                    cout << "[LOI] Dinh dang ngay khong ton tai tren lich! Vui long nhap lai." << endl;
+                } else break;
+            }
             // Ép sang số nguyên để so sánh (YYYYMMDD)
             int start = report.ChuyenNgaySangInt(tuNgay); 
             int end = report.ChuyenNgaySangInt(denNgay);
