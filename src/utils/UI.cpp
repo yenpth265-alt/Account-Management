@@ -62,6 +62,7 @@ void MenuQuanLy(BankSystem& bank){
     cout << "========================================" << endl;
     cout << "  1. Dang ky Khach hang & Tao Tai khoan " << endl;
     cout << "  2. Doi ma PIN tai khoan               " << endl;
+    cout << "  3. Doi so dien thoai                  " << endl;
     cout << "  0. Quay lai                           " << endl;
     cout << "========================================" << endl;
     cout << "Nhap lua chon: ";
@@ -156,6 +157,53 @@ void MenuQuanLy(BankSystem& bank){
                 SaveAllData(bank); 
             } else {
                 cout << "[LOI] Ma PIN hien tai khong dung! Thao tac that bai." << endl;
+            }
+            break;
+        }
+        case 3: {
+            string stk, pin, sdtMoi;
+            cout << "--- DOI SO DIEN THOAI KHACH HANG ---" << endl;
+            cout << "Nhap So tai khoan: "; cin >> stk;
+
+            Account* tk = bank.timKiemTaiKhoan(stk);
+            if (tk == NULL) {
+                cout << "[LOI] Khong tim thay tai khoan " << stk << "!" << endl;
+                break;
+            }
+
+            bool pinDung = false;
+            for (int lan = 1; lan <= 3; lan++) {
+                cout << "Nhap ma PIN de xac thuc (lan " << lan << "/3): ";
+                cin >> pin;
+                if (tk->kiemTraPIN(pin)) { 
+                    pinDung = true; 
+                    break; 
+                }
+                cout << "[LOI] Ma PIN khong dung!";
+                if (lan < 3) cout << " Vui long thu lai." << endl;
+            }
+
+            if (!pinDung) {
+                cout << "\n[CANH BAO] Sai PIN 3 lan. Huy thao tac doi so dien thoai." << endl;
+                break;
+            }
+
+            while (true) {
+                cout << "Nhap SDT moi (10 chu so, bat dau bang 0): "; cin >> sdtMoi;
+                if (!BankSystem::kiemTraSDTHopLe(sdtMoi)) {
+                    cout << "[LOI] SDT khong hop le. Vui long nhap lai." << endl;
+                } else {
+                    break;
+                }
+            }
+
+            Customer* kh = bank.timKiemKhachHang(tk->getMaKH());
+            if (kh != NULL) {
+                kh->setSDT(sdtMoi); 
+                cout << "[THANH CONG] Da doi so dien thoai moi cho khach hang " << kh->getHoTen() << "!" << endl;
+                SaveAllData(bank);
+            } else {
+                cout << "[LOI] Khong tim thay thong tin khach hang lien ket voi tai khoan này!" << endl;
             }
             break;
         }

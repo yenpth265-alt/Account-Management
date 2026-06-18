@@ -30,13 +30,6 @@ std::string Customer::getSDT() const{
 }
 
 //sửa dữ liệu
-void Customer::setHoTen(std::string hoTenMoi){
-    this->hoTen = hoTenMoi;
-}
-
-void Customer::setCCCD(std::string cccdMoi){
-    this->cccd = cccdMoi;
-}
 void Customer::setSDT(std::string sdtMoi){
     this->sdt = sdtMoi;
 }
