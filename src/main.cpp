@@ -20,8 +20,6 @@ int main(){
   // Đồng bộ số GD đã tạo, tránh sinh trùng mã GD
   trans.SetSoGDDaTao(bank.getDanhSachGD().getSize());
 
-  report.TuDongChotLaiHangThang();
-    SaveAllData(bank);
   // Chạy giao diện
   MenuChinh(bank, trans, report);
 

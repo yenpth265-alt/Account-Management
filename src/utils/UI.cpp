@@ -32,7 +32,16 @@ long long NhapSoTien(){
 }
 
 void MenuChinh(BankSystem& bank, TransactionLogic& trans, ReportLogic& report){
+    KetQuaChotLai kq = report.TuDongChotLaiHangThang();
+    if (kq.soTKDuocCong > 0) {
+        cout << "[HE THONG] Phat hien " << kq.soTKDuocCong
+             << " tai khoan chua duoc chot lai cac thang truoc." << endl;
+        cout << "[HE THONG] Da tu dong cong tong cong "
+             << kq.tongTienCong << " VND tien lai!" << endl;
+        cout << "----------------------------------------" << endl;
+    }
     int luaChon;
+    
     do {
         cout << "========================================" << endl;
         cout << "    HE THONG QUAN LY NGAN HANG         " << endl;
@@ -129,7 +138,6 @@ void MenuQuanLy(BankSystem& bank){
             } else {
                 cout << "\n[LOI] Them khach hàng that bai!" << endl;
             }
-            SaveAllData(bank); 
             break;
         }
         case 2: { 
@@ -234,7 +242,6 @@ void MenuGiaoDich(TransactionLogic& trans) {
 
     cout << "Nhap STK: "; cin >> stk;
 
-    // Xác thực mã PIN trước khi thực hiện giao dịch nào
     Account* tk = trans.getBankSystem()->timKiemTaiKhoan(stk);
     if (tk == NULL) {
         cout << "[LOI] Tai khoan khong ton tai!" << endl;
@@ -246,9 +253,12 @@ void MenuGiaoDich(TransactionLogic& trans) {
         case 1:{ // Nạp tiền
             cout << "Nhap so tien nap: "; 
             long long soTien = NhapSoTien();
-            trans.NapTien(stk, soTien);
-            SaveAllData(*(trans.getBankSystem()));
-            break;;
+            if (trans.NapTien(stk, soTien)){
+                cout << "[THANH CONG] Da nap " << soTien << " VND vao tai khoan " << stk
+                << ". So du moi: " << tk->getSoDu() <<"VND" << endl;
+                SaveAllData(*(trans.getBankSystem()));
+            } 
+            break;
         }
 
         case 2:{  // Rút tiền
@@ -271,8 +281,14 @@ void MenuGiaoDich(TransactionLogic& trans) {
                 cout << "Nhap so tien rut: ";
                 long long soTien = NhapSoTien();
                 if (trans.RutTien(stk, pin, soTien)){
+                    cout << "[THANH CONG] Da rut " <<  soTien 
+                    << " VND tu tai khoan " << stk
+                    << ". So du con lai: " << tk->getSoDu() << "VND" << endl;
+    
                     SaveAllData(*(trans.getBankSystem()));
                     break;
+                } else{
+                    cout << "[LOI] So du khong du de rut!" << endl;
                 }
                  
                 cout << "Ban co muon thu lai khong? (Nhap so bat ky de TIEP TUC, go 0 de HUY): ";
@@ -325,8 +341,14 @@ void MenuGiaoDich(TransactionLogic& trans) {
                 long long soTien = NhapSoTien();
 
                 if (trans.ChuyenKhoan(stk, pin, stkNhan, soTien)) {
+                    cout << "[THANH CONG] Da chuyen " << soTien
+                    << " VND tu " << stk << " den " << stkNhan
+                    << ". So du con lai TK gui: " << tk->getSoDu() << "VND" << endl;
+    
                     SaveAllData(*(trans.getBankSystem()));
                     break; 
+                } else {
+                    cout << "[LOI] So du tai khoan " << stk << " khong du de chuyen!" << endl;
                 }
                 
                 cout << "Ban co muon thu lai khong? (Nhap so bat ky de TIEP TUC, go 0 de HUY): ";

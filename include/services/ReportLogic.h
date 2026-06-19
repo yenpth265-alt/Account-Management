@@ -3,6 +3,11 @@
 #define REPORTLOGIC_H
 #include "BankSystem.h"
 #include "string"
+
+struct KetQuaChotLai {
+        int soTKDuocCong;
+        long long tongTienCong;
+};
 class ReportLogic {
     private:
         BankSystem* bankSystem; //con trỏ trỏ tới hệ thống ngân hàng đang chạy
@@ -15,8 +20,7 @@ class ReportLogic {
     // In lịch sử giao dịch của 1 tk cụ thể
     // giao dịch nạp/rút/chuyển khoản của tk đó 
     void XemLichSuTheoTK(std::string soTK);
-    void TuDongChotLaiHangThang();
-
+    
     // In sao kê (số dư hiện tại, danh sách giao dịch) cho 1 tk
     void XemSaoKe(std::string soTK);
 
@@ -26,5 +30,9 @@ class ReportLogic {
     // Thêm vào trong class ReportLogic
     double TinhLaiThang(std::string soTK, double laiSuatNamPhanTram,
                             int thangXem = 0, int namXem = 0);
+    
+    
+    KetQuaChotLai TuDongChotLaiHangThang();
+
 };
 #endif

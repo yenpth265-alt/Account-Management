@@ -66,7 +66,7 @@ Account* BankSystem::timKiemTaiKhoan(std::string soTK) {
 // ==========================================
 bool BankSystem::themKhachHang(std::string maKH, std::string hoTen, std::string cccd, std::string sdt) {
     if (timKiemKhachHang(maKH) != NULL) {
-        std::cout << "[LOI] Ma khach hang " << maKH << " da ton tai trong he thong!" << std::endl;
+        //std::cout << "[LOI] Ma khach hang " << maKH << " da ton tai trong he thong!" << std::endl;
         return false;
     }
     
@@ -81,17 +81,17 @@ bool BankSystem::themKhachHang(std::string maKH, std::string hoTen, std::string 
 // ==========================================
 bool BankSystem::taoTaiKhoan(std::string soTK, std::string maKH, std::string maPIN, long long soDuBanDau) {
     if (kiemTraTrungSTK(soTK) == true) {
-        std::cout << "[LOI] So tai khoan " << soTK << " da co nguoi su dung!" << std::endl;
+        //std::cout << "[LOI] So tai khoan " << soTK << " da co nguoi su dung!" << std::endl;
         return false;
     }
 
     if (timKiemKhachHang(maKH) == NULL) {
-        std::cout << "[LOI] Khong tim thay khach hang ma " << maKH << ". Vui long tao KH truoc!" << std::endl;
+        //std::cout << "[LOI] Khong tim thay khach hang ma " << maKH << ". Vui long tao KH truoc!" << std::endl;
         return false;
     }
 
     if (soDuBanDau < 50000) {
-        std::cout << "[LOI] So du ban dau phai >= 50.000 VND!" << std::endl;
+        //std::cout << "[LOI] So du ban dau phai >= 50.000 VND!" << std::endl;
         return false;
     }
 
@@ -100,7 +100,7 @@ bool BankSystem::taoTaiKhoan(std::string soTK, std::string maKH, std::string maP
     Account tkMoi(soTK, maKH, maPIN, soDuBanDau, ngayMo);
     danhSachTK.addTail(tkMoi);
     
-    std::cout << "[THANH CONG] Da tao tai khoan " << soTK << " cho khach hang " << maKH << std::endl;
+    //std::cout << "[THANH CONG] Da tao tai khoan " << soTK << " cho khach hang " << maKH << std::endl;
     return true;
 }
 

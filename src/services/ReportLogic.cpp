@@ -118,7 +118,7 @@ void ReportLogic::XemLichSuTheoTK(string soTK){
 
 void ReportLogic::XemSaoKe(string soTK){
     Account* tk = this->bankSystem->timKiemTaiKhoan(soTK);
-    if (tk == NULL){ cout << "[LOI] Khong tim thay tai khoan " << soTK << endl; return; }
+    if (tk == NULL) return; 
     cout << "========================================" << endl;
     cout << "       SAO KE TAI KHOAN: " << soTK        << endl;
     cout << "========================================" << endl;
@@ -228,7 +228,7 @@ double ReportLogic::TinhLaiThang(string soTK, double laiSuatNamPhanTram, int tha
 // -------------------------------------------------------
 // TỰ ĐỘNG CHỐT LÃI KHI SANG THÁNG MỚI
 // -------------------------------------------------------
-void ReportLogic::TuDongChotLaiHangThang() {
+KetQuaChotLai ReportLogic::TuDongChotLaiHangThang() {
     string ngayHienTai = LayNgayHienTai();
     int dNow, mNow, yNow;
     sscanf(ngayHienTai.c_str(), "%d/%d/%d", &dNow, &mNow, &yNow);
@@ -295,9 +295,13 @@ void ReportLogic::TuDongChotLaiHangThang() {
     }
 
     // Nếu có cộng lãi cho ai đó, in ra một thông báo nhỏ lúc bật app
-    if (soTKTKDuocCong > 0) {
-        cout << "[HE THONG] Phat hien " << soTKTKDuocCong << " tai khoan chua duoc chot lai cac thang truoc." << endl;
-        cout << "[HE THONG] Da tu dong quet va cong tong cong " <<(long long)tongTienCong << " VND tien lai vao cac tai khoan!" << endl;
-        cout << "----------------------------------------" << endl;
-    }
+    //if (soTKTKDuocCong > 0) {
+      //  cout << "[HE THONG] Phat hien " << soTKTKDuocCong << " tai khoan chua duoc chot lai cac thang truoc." << endl;
+        //cout << "[HE THONG] Da tu dong quet va cong tong cong " <<(long long)tongTienCong << " VND tien lai vao cac tai khoan!" << endl;
+        //cout << "----------------------------------------" << endl;
+    //}
+    KetQuaChotLai kq;
+    kq.soTKDuocCong = soTKTKDuocCong;
+    kq.tongTienCong = tongTienCong;
+    return kq;
 }
