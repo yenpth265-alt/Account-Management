@@ -1,4 +1,4 @@
-#include "models/Transaction.h"
+#include "../../include/models/transaction.h"
 #include <iostream>
 #include <string>
 
@@ -15,7 +15,7 @@ Transaction::Transaction(){
 Transaction::Transaction(std::string maGD, 
                 std::string thoiGian, 
                 std::string loaiGD,
-                double soTien, std::string soTKGui ,
+                long long soTien, std::string soTKGui ,
                 std::string soTKNhan) {
     this->maGD = maGD;
     this->thoiGian = thoiGian;
@@ -35,9 +35,18 @@ std::string Transaction::getThoiGian() const {
 std::string Transaction::getLoaiGD() const { 
     return this->loaiGD; 
 }
-double Transaction::getSoTien() const { 
+long long Transaction::getSoTien() const { 
     return this->soTien; 
 }
+// header có mà cpp ko thấy nma nhét 2 hàm này vào
+// lại thấy lỗi :))
+std::string Transaction::getSoTKGui() const {
+    return this->soTKGui;
+}
+std::string Transaction::getSoTKNhan() const {
+    return this->soTKNhan;
+}
+
 
 //3. Hàm sinh mã tự động
 std::string Transaction::sinhMaGD(int soThuTuMoi) {
@@ -52,13 +61,13 @@ void Transaction::xuatThongTin() const {
     std::cout << "[" << this->thoiGian << "] " 
               << "Ma GD: " << this->maGD 
               << " | Loai: " << this->loaiGD 
-              << " | So tien: " << std::fixed << this->soTien << " VND";
+              << " | So tien: " << this->soTien << " VND";
 
     //Nếu là gd ckhoan thì in thêm người nhận
-    if (this->loaiGD == "CHUYEN_KHOAN" && this->maTKDich != "N/A") {
+    if (this->loaiGD == "CHUYEN_KHOAN" && this->soTKNhan != "N/A") {
         std::cout << " | Tu TK: " << this->soTKGui << " -> Den TK: " << this->soTKNhan;
     } else {
-        std::cout << " | TK: " << this->soTK;
+        std::cout << " | TK: " << this->soTKGui;
     }
     
     std::cout << std::endl;

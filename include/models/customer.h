@@ -21,9 +21,7 @@ class Customer {
         std::string getCCCD() const;
         std::string getSDT() const;
         
-        //sửa, cập nhật dữ liệu
-        void setHoTen(std::string hoTenMoi);
-        void setCCCD(std::string cccdMoi);
+        //sửa, cập nhật sdt
         void setSDT(std::string sdtMoi);
     
         //xuatThongTin
