@@ -12,7 +12,6 @@ void XoaManHinh(){
 
 void DungManHinh(){
     cout << "\nNhan Enter de tiep tuc";
-    // Xóa sạch bộ nhớ đệm để không bị trôi lệnh
     cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     cin.get();
 }
@@ -65,7 +64,6 @@ void MenuChinh(BankSystem& bank, TransactionLogic& trans, ReportLogic& report){
 }
 
 void MenuQuanLy(BankSystem& bank){
-    // XoaManHinh(); // Đã comment lại để không bị xóa mất chữ, đỡ rối màn hình
     cout << "========================================" << endl;
     cout << "   QUAN LY KHACH HANG & TAI KHOAN      " << endl;
     cout << "========================================" << endl;
@@ -382,7 +380,6 @@ void MenuBaoCao(BankSystem& bank, ReportLogic& report) {
     string stk;
     cout << "Nhap STK: "; cin >> stk;
 
-    // Kiểm tra tài khoản tồn tại trước khi làm tiếp
     if (bank.timKiemTaiKhoan(stk) == NULL) {
         cout << "[LOI] Khong tim thay tai khoan " << stk << "!" << endl;
         DungManHinh();
@@ -412,7 +409,7 @@ void MenuBaoCao(BankSystem& bank, ReportLogic& report) {
             // Ép sang số nguyên để so sánh (YYYYMMDD)
             int start = report.ChuyenNgaySangInt(tuNgay); 
             int end = report.ChuyenNgaySangInt(denNgay);
-            int now = report.ChuyenNgaySangInt(report.LayNgayHienTai()); // Bạn cần chỉnh public các hàm tiện ích này trong ReportLogic
+            int now = report.ChuyenNgaySangInt(report.LayNgayHienTai()); 
 
             if (start > now || end > now) {
                 cout << "[LOI] Khong the sao ke giao dich trong tuong lai!" << endl;
@@ -429,7 +426,43 @@ void MenuBaoCao(BankSystem& bank, ReportLogic& report) {
         }
         case 3: {
             cout << "--- TRA CUU TIEN LAI TICH LUY ---" << endl;
-            report.TinhLaiThang(stk, 4.0, 0, 0); 
+            
+            string ngayHienTai = report.LayNgayHienTai();
+            int dNow, mNow, yNow;
+            sscanf(ngayHienTai.c_str(), "%d/%d/%d", &dNow, &mNow, &yNow);
+            
+            double tongLaiThangNay = report.TinhLaiThang(stk, 4.0, mNow, yNow);
+            
+            if (tongLaiThangNay == -2) {
+                cout << "\n[THONG BAO] Thang " << mNow << "/" << yNow << " da duoc chot lai truoc do!" << endl;
+            } else if (tongLaiThangNay == 0.0) {
+                cout << "[THONG BAO] Trong thang " << mNow << "/" << yNow << ", tai khoan chua hoat dong!" << endl;
+            } else if (tongLaiThangNay > 0.0) {
+                Account* tk = bank.timKiemTaiKhoan(stk);
+                
+                int dMo, mMo, yMo; 
+                sscanf(tk->getNgayMo().c_str(), "%d/%d/%d", &dMo, &mMo, &yMo);
+                
+                int soNgayTinhLai = 0;
+                if (mMo == mNow && yMo == yNow) {
+                    soNgayTinhLai = dNow - dMo + 1;
+                } else {
+                    soNgayTinhLai = dNow;
+                }
+
+                cout << "\n========================================" << endl;
+                cout << " BANG TINH LAI SUAT CHI TIET (" << mNow << "/" << yNow << ")" << endl;
+                cout << "========================================" << endl;
+                cout << "Tai khoan    : " << stk << endl;
+                cout << "Lai suat     : " << (long long)4.0 << "% / nam" << endl;
+                cout << "----------------------------------------" << endl;
+                cout << "So ngay tinh lai hop le: " << soNgayTinhLai << " ngay" << endl;
+                cout << "Tien lai TAM TINH: " << (long long)tongLaiThangNay << " VND" << endl;
+                cout << "----------------------------------------" << endl;
+                cout << "Tong lai da chot cac thang truoc: " << report.TinhTongLaiDaCong(stk) << " VND" << endl;
+                cout << "So du hien tai (Chua gom lai tam tinh): " << tk->getSoDu() << " VND" << endl;
+                cout << "========================================" << endl;
+            }
             break;
         }
         default:

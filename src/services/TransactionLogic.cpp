@@ -15,7 +15,7 @@ TransactionLogic::TransactionLogic(BankSystem* bank){
 void TransactionLogic::SetSoGDDaTao(int soGD){
     this->soGDDaTao = soGD;
 }
-// HÀM PHỤ: GHI NHẬN GIAO DỊCH
+// Hàm phụ: ghi nhận giao dịch
 void TransactionLogic::GhiNhanGiaoDich(std::string loaiGD, long long soTien, std::string soTKGui, std::string soTKNhan){
     this->soGDDaTao++;
 
@@ -36,17 +36,14 @@ void TransactionLogic::GhiNhanGiaoDich(std::string loaiGD, long long soTien, std
 // NẠP TIỀN
 bool TransactionLogic::NapTien(std::string soTK, long long soTien){
     if (soTien <= 0){
-        std::cout << "[LOI] So tien nap phai lon hon 0!" << std::endl;
         return false;
     }
 
     Account* tk = this->bankSystem->timKiemTaiKhoan(soTK);
     if (tk == NULL){
-        std::cout << "[LOI] Khong tim thay tai khoan" << soTK << "!" << std::endl;
         return false;
     }
     if (tk->napTien(soTien) == false){
-        std::cout << "[LOI] Nap tien khong thanh cong!" << std::endl;
         return false;
     }
     // ghi nhận giao dịch: nạp tiền không có người nhận, để "N/A"
@@ -57,17 +54,14 @@ bool TransactionLogic::NapTien(std::string soTK, long long soTien){
 // RÚT TIỀN
 bool TransactionLogic::RutTien(std::string soTK, std::string maPIN, long long soTien){
     if (soTien <=0){
-        std::cout <<"[LOI] So tien rut phai lon hon 0!" << std::endl;
         return false;
     }
     Account* tk = this->bankSystem->timKiemTaiKhoan(soTK);
     if (tk == NULL){
-        std::cout << "[LOI] Khong tim thay tai khoan " << soTK << "!" << std::endl;
         return false;
     }
 
     if (tk->kiemTraPIN(maPIN) ==false){
-        std::cout << "[LOI] Ma PIN khong dung!" << std::endl;
         return false;
     }
     if (tk->rutTien(soTien) == false){
@@ -77,33 +71,28 @@ bool TransactionLogic::RutTien(std::string soTK, std::string maPIN, long long so
     GhiNhanGiaoDich("RUT", soTien, soTK, "N/A");
     return true;
 }
-// CHUYEN KHOAN
+// CHUYỂN KHOẢN
 bool TransactionLogic::ChuyenKhoan(std::string soTKGui, std::string maPIN,
                                     std::string soTKNhan, long long soTien) {
     if (soTien <= 0) {
-        std::cout << "[LOI] So tien chuyen phai lon hon 0!" << std::endl;
         return false;
     }
  
     if (soTKGui == soTKNhan) {
-        std::cout << "[LOI] Khong the chuyen khoan cho chinh minh!" << std::endl;
         return false;
     }
  
     Account* tkGui = this->bankSystem->timKiemTaiKhoan(soTKGui);
     if (tkGui == NULL) {
-        std::cout << "[LOI] Khong tim thay tai khoan gui " << soTKGui << "!" << std::endl;
         return false;
     }
  
     Account* tkNhan = this->bankSystem->timKiemTaiKhoan(soTKNhan);
     if (tkNhan == NULL) {
-        std::cout << "[LOI] Khong tim thay tai khoan nhan " << soTKNhan << "!" << std::endl;
         return false;
     }
 
     if (tkGui->kiemTraPIN(maPIN) == false) {
-        std::cout << "[LOI] Ma PIN khong dung!" << std::endl;
         return false;
     }
  

@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-//1. Hàm khởi tạo
+//Hàm khởi tạo
 Transaction::Transaction(){
     this->maGD = "CHUA_CO";
     this->thoiGian = "N/A";
@@ -25,7 +25,7 @@ Transaction::Transaction(std::string maGD,
     this->soTKNhan = soTKNhan;
 }
 
-//2. Hàm getters
+//Hàm getters
 std::string Transaction::getMaGD() const {
     return this->maGD;
 }
@@ -38,8 +38,6 @@ std::string Transaction::getLoaiGD() const {
 long long Transaction::getSoTien() const { 
     return this->soTien; 
 }
-// header có mà cpp ko thấy nma nhét 2 hàm này vào
-// lại thấy lỗi :))
 std::string Transaction::getSoTKGui() const {
     return this->soTKGui;
 }
@@ -48,7 +46,7 @@ std::string Transaction::getSoTKNhan() const {
 }
 
 
-//3. Hàm sinh mã tự động
+//Hàm sinh mã tự động
 std::string Transaction::sinhMaGD(int soThuTuMoi) {
     std::string chuoiSo = std::to_string(soThuTuMoi);
     while (chuoiSo.length() < 3) {

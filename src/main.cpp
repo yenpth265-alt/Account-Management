@@ -9,7 +9,7 @@ using namespace std;
 int main(){
 
 
-  // Khởi tạo đối tượng
+  // Khởi tạo 
   BankSystem bank;
   TransactionLogic trans(&bank);
   ReportLogic report(&bank);

@@ -12,7 +12,7 @@ static std::string LayNgayHienTai() {
     return std::string(buf);
 }
 
-//1. Triển khai hàm khởi tạo
+//Triển khai hàm khởi tạo
 
 //Hàm khởi tạo mặc định (mới tạo mảng/ds trống)
 Account::Account(){
@@ -33,7 +33,7 @@ Account::Account(std::string soTK, std::string maKH,
         this->ngayMo = ngayMo;
 }
 
-//2. Lấy dữ liệu
+//Lấy dữ liệu
 
 std::string Account::getSoTK() const {
     return this->soTK;
@@ -48,7 +48,7 @@ std::string Account::getNgayMo() const{
     return this->ngayMo;
 }
 
-//3. Xử lý nghiệp vụ
+//Xử lý nghiệp vụ
  
 //Hàm đối chiếu mã PIN
 bool Account::kiemTraPIN(std::string pinNhapVao) const {

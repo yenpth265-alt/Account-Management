@@ -8,7 +8,7 @@
 
 using namespace std;
 
-// Hàm hỗ trợ format chuỗi số (ví dụ: 1 -> "001")
+// Hàm hỗ trợ định dạng chuỗi số (vd: 1 -> "001")
 string formatID(string prefix, int id, int width = 3) {
     ostringstream oss;
     oss << prefix << setfill('0') << setw(width) << id;
@@ -16,16 +16,14 @@ string formatID(string prefix, int id, int width = 3) {
 }
 
 int main() {
-    // Cấu hình số lượng dữ liệu muốn sinh
-    int soLuongKH = 20;    // 20 khách hàng
-    int soLuongTK = 30;    // 30 tài khoản (một số KH có nhiều tài khoản)
-    int soLuongGD = 100;   // 100 giao dịch
+    int soLuongKH = 20;    
+    int soLuongTK = 30;    
+    int soLuongGD = 100;   
 
-    // Khởi tạo engine sinh số ngẫu nhiên
     random_device rd;
     mt19937 gen(rd());
 
-    // --- 1. SINH DỮ LIỆU KHÁCH HÀNG (customers.txt) ---
+    // sinh dữ liệu khách hàng
     vector<string> listMaKH;
     vector<string> ho = {"Nguyen", "Tran", "Le", "Pham", "Hoang", "Vu", "Vo", "Dang", "Bui", "Do"};
     vector<string> dem = {"Van", "Thi", "Huu", "Ngoc", "Xuan", "Quang", "Minh", "Thu", "Tuan", "Hoai"};
@@ -59,7 +57,7 @@ int main() {
     cout << "-> Da sinh thanh cong " << soLuongKH << " khach hang vao data/customers.txt" << endl;
 
 
-    // --- 2. SINH DỮ LIỆU TÀI KHOẢN (accounts.txt) ---
+    // sinh dữ liệu tài khoản
     vector<string> listSoTK;
     uniform_int_distribution<> dist_kh(0, listMaKH.size() - 1);
     uniform_int_distribution<long long> dist_stk(100000000, 999999999); // Số tài khoản 9 số
@@ -97,13 +95,13 @@ int main() {
     cout << "-> Da sinh thanh cong " << soLuongTK << " tai khoan vao data/accounts.txt" << endl;
 
 
-    // --- 3. SINH DỮ LIỆU GIAO DỊCH (transactions.txt) ---
+    // sinh dữ liệu giao dịch
     vector<string> loaiGiaoDich = {"NAP", "RUT", "CHUYEN_KHOAN"};
     uniform_int_distribution<> dist_loai(0, 2);
     uniform_int_distribution<> dist_tk(0, listSoTK.size() - 1);
     uniform_int_distribution<> dist_gio(0, 23);
     uniform_int_distribution<> dist_phut(0, 59);
-    uniform_real_distribution<> dist_sotien_gd(50000.0, 5000000.0); // Giao dịch từ 50k đến 5tr
+    uniform_real_distribution<> dist_sotien_gd(50000.0, 5000000.0); 
 
     ofstream fileGD("data/transactions.txt");
     if (!fileGD.is_open()) {
@@ -118,7 +116,6 @@ int main() {
     for (int i = 1; i <= soLuongGD; ++i) {
         string maGD = formatID("GD", i);
         
-        // Format thời gian: dd/mm/yyyy hh:mm
         ostringstream thoiGian;
         thoiGian << setfill('0') << setw(2) << dist_ngay(gen) << "/" 
                  << setw(2) << dist_thang(gen) << "/" << dist_nam(gen) << " "
@@ -130,7 +127,6 @@ int main() {
         string soTKGui = listSoTK[dist_tk(gen)];
         string soTKNhan = "N/A";
         
-        // Nếu là chuyển khoản thì bốc ngẫu nhiên thêm một tài khoản nhận (khác tài khoản gửi)
         if (loaiGD == "CHUYEN_KHOAN") {
             do {
                 soTKNhan = listSoTK[dist_tk(gen)];

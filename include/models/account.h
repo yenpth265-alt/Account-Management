@@ -30,7 +30,6 @@ class Account {
         bool rutTien(long long soTien);
         void xuatThongTin() const;
 
-        // Cho phép hàm lưu file truy cập PIN để ghi ra đĩa (không public ra ngoài)
         friend void SaveAllData(class BankSystem& bank);
 };
 

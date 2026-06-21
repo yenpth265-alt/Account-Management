@@ -10,7 +10,7 @@ void XoaManHinh();
 void DungManHinh();
 long long NhapSoTien();
 
-// Các hàm hiển thị menu có truyền tham số hệ thống
+// Các hàm hiển thị menu 
 void MenuChinh(BankSystem& bank, TransactionLogic& trans, ReportLogic& report);      // Menu tổng quát
 void MenuQuanLy(BankSystem& bank);                                                   // Quản lý khách hàng và tài khoản
 void MenuGiaoDich(TransactionLogic& trans);                                          // Nghiệp vụ nạp, rút, chuyển khoản

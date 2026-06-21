@@ -15,9 +15,7 @@ BankSystem::BankSystem() {
     // LinkedList đã tự khởi tạo danh sách rỗng
 }
 
-// ==========================================
-// 1. KIỂM TRA TRÙNG
-// ==========================================
+// kiểm tra trùng
 bool BankSystem::kiemTraTrungSTK(std::string soTK) {
     Node<Account>* current = danhSachTK.getHead();
     while (current != NULL) {
@@ -36,18 +34,16 @@ bool BankSystem::kiemTraTrungCCCD(std::string cccd) {
     return false;
 }
 
-// ==========================================
-// 2. TÌM KIẾM KHÁCH HÀNG & TÀI KHOẢN
-// ==========================================
+// tìm khách hàng và tài khoản 
 Customer* BankSystem::timKiemKhachHang(std::string maKH) {
     Node<Customer>* current = danhSachKH.getHead();
     while (current != NULL) {
         if (current->data.getMaKH() == maKH) {
-            return &(current->data); // Trả về địa chỉ của khách hàng
+            return &(current->data); 
         }
         current = current->next;
     }
-    return NULL; // Không tìm thấy
+    return NULL; 
 }
 
 Account* BankSystem::timKiemTaiKhoan(std::string soTK) {
@@ -61,12 +57,9 @@ Account* BankSystem::timKiemTaiKhoan(std::string soTK) {
     return NULL; 
 }
 
-// ==========================================
-// 3. THÊM KHÁCH HÀNG
-// ==========================================
+// thêm kh
 bool BankSystem::themKhachHang(std::string maKH, std::string hoTen, std::string cccd, std::string sdt) {
     if (timKiemKhachHang(maKH) != NULL) {
-        //std::cout << "[LOI] Ma khach hang " << maKH << " da ton tai trong he thong!" << std::endl;
         return false;
     }
     
@@ -76,22 +69,17 @@ bool BankSystem::themKhachHang(std::string maKH, std::string hoTen, std::string 
    return true;
 }
 
-// ==========================================
-// 4. TẠO TÀI KHOẢN MỚI
-// ==========================================
+// ạo tk mới
 bool BankSystem::taoTaiKhoan(std::string soTK, std::string maKH, std::string maPIN, long long soDuBanDau) {
     if (kiemTraTrungSTK(soTK) == true) {
-        //std::cout << "[LOI] So tai khoan " << soTK << " da co nguoi su dung!" << std::endl;
         return false;
     }
 
     if (timKiemKhachHang(maKH) == NULL) {
-        //std::cout << "[LOI] Khong tim thay khach hang ma " << maKH << ". Vui long tao KH truoc!" << std::endl;
         return false;
     }
 
     if (soDuBanDau < 50000) {
-        //std::cout << "[LOI] So du ban dau phai >= 50.000 VND!" << std::endl;
         return false;
     }
 
@@ -100,7 +88,6 @@ bool BankSystem::taoTaiKhoan(std::string soTK, std::string maKH, std::string maP
     Account tkMoi(soTK, maKH, maPIN, soDuBanDau, ngayMo);
     danhSachTK.addTail(tkMoi);
     
-    //std::cout << "[THANH CONG] Da tao tai khoan " << soTK << " cho khach hang " << maKH << std::endl;
     return true;
 }
 
@@ -108,16 +95,14 @@ bool BankSystem::taoTaiKhoan(std::string soTK, std::string maKH, std::string maP
 bool BankSystem::naptaiKhoanTuFile(std::string soTK, std::string maKH, 
                                     std::string maPIN, long long soDu, std::string ngayMo) {
     if (kiemTraTrungSTK(soTK)) {
-        return false; // tránh trùng STK nếu file bị lỗi
+        return false; 
     }
     Account tk(soTK, maKH, maPIN, soDu, ngayMo);
     danhSachTK.addTail(tk);
     return true;
 }
 
-// ==========================================
-// GETTERS
-// ==========================================
+// getters
 LinkedList<Transaction>& BankSystem::getDanhSachGD() {
     return danhSachGD; 
 }
@@ -125,9 +110,6 @@ LinkedList<Customer>&    BankSystem::getDanhSachKH() {
     return danhSachKH; 
 }
 
-// ==========================================
-// VALIDATION DỮ LIỆU ĐẦU VÀO
-// ==========================================
 
 
 bool BankSystem::kiemTraCCCDHopLe(const std::string& cccd) {
@@ -155,9 +137,7 @@ bool BankSystem::kiemTraSDTHopLe(const std::string& sdt) {
     return true;
 }
 
-// ==========================================
-// SINH MÃ TỰ ĐỘNG
-// ==========================================
+// sinh mã tự động
 std::string BankSystem::sinhMaKHMoi() {
     int soKH = danhSachKH.getSize() + 1;
     std::string maKH = Customer::sinhMaKH(soKH);

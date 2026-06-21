@@ -7,7 +7,7 @@
 # include "../../include/utils/fileManager.h"
 
 using namespace std;
-// Tach chuoi bang dau |
+// tách chuỗi bằng dấu |
 string getNextToken(stringstream& ss){
     string token;
     getline(ss,token, '|');
@@ -18,7 +18,7 @@ void LoadAllData (BankSystem& bank){
     string dummyLine; // biến tạm chứa dòng tiêu đề
     string line;
 
-    // Doc khach hang
+    //đọc khách hàng
     ifstream fileKH("data/customers.txt");
     if (!fileKH.is_open()) {
         cout << "[CANH BAO] Khong tim thay file data/customers.txt. Bat dau voi du lieu trong." << endl;
@@ -36,7 +36,7 @@ void LoadAllData (BankSystem& bank){
         fileKH.close();
     }
 
-    //Doc tai khoan
+    //đọc tài khoản
     ifstream fileTK("data/accounts.txt");
     if (!fileTK.is_open()) {
         cout << "[CANH BAO] Khong tim thay file data/accounts.txt. Bat dau voi du lieu trong." << endl;
@@ -55,7 +55,7 @@ void LoadAllData (BankSystem& bank){
         fileTK.close();
     }
 
-    //Doc giao dich
+    //đọc giao dịch
     ifstream fileGD("data/transactions.txt");
     if (!fileGD.is_open()) {
         cout << "[CANH BAO] Khong tim thay file data/transactions.txt. Bat dau voi du lieu trong." << endl;
