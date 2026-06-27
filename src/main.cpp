@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include <iostream>
 #include <string>
 
@@ -70,3 +71,36 @@ int main() {
     cout << "\n========== TEST HOAN TAT ==========" << endl;
     return 0;
 }
+=======
+# include <iostream>
+# include <iomanip>
+# include "../include/utils/UI.h"
+# include "../include/utils/fileManager.h"
+# include "../include/services/BankSystem.h"
+# include "../include/services/TransactionLogic.h"
+
+using namespace std;
+int main(){
+
+
+  // Khởi tạo 
+  BankSystem bank;
+  TransactionLogic trans(&bank);
+  ReportLogic report(&bank);
+
+  // Nạp dữ liệu từ file vào hệ thống
+  LoadAllData(bank);
+
+  // Đồng bộ số GD đã tạo, tránh sinh trùng mã GD
+  trans.SetSoGDDaTao(bank.getDanhSachGD().getSize());
+
+  // Chạy giao diện
+  MenuChinh(bank, trans, report);
+
+  // Lưu dữ liệu lại vào file
+  SaveAllData(bank);
+
+  return 0;
+}
+  
+>>>>>>> 8f16444fe624b04dc7f66b175c12c58b1bdb81bd

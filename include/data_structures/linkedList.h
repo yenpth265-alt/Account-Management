@@ -10,7 +10,7 @@ struct Node {
     //hàm khởi tạo node
     Node(T newData){
         this->data = newData;
-        this->next = nullptr;
+        this->next = NULL;
     }
 };
 //Cấu trúc dsach liên kết
@@ -23,8 +23,8 @@ class LinkedList{
     public:
     //danh sách rỗng
         LinkedList(){
-            this->head = nullptr;
-            this->tail = nullptr;
+            this->head = NULL;
+            this->tail = NULL;
             this->count = 0;
         }
     //Hàm hủy
@@ -39,7 +39,7 @@ class LinkedList{
     void addTail(Y newData){
         Node<Y>* newNode = new Node<Y>(newData);
 
-        if(this->head == nullptr){
+        if(this->head == NULL){
             this->head = newNode;
             this->tail = newNode;
         } else {
@@ -55,13 +55,13 @@ class LinkedList{
     //Dọn dẹp dsach
     void clear(){
         Node<Y>* current = this->head;
-        while(current != nullptr){
+        while(current != NULL){
             Node<Y>* nextNode = current->next;
             delete current;
             current = nextNode;
         }
-        this->head = nullptr;
-        this->tail = nullptr;
+        this->head = NULL;
+        this->tail = NULL;
         this->count = 0;
     }
 };

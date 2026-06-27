@@ -8,7 +8,7 @@ class Transaction {
         std::string maGD;
         std::string thoiGian;
         std::string loaiGD;
-        double soTien;
+        long long soTien;
         std::string soTKGui;
         std::string soTKNhan;
     
@@ -16,14 +16,14 @@ class Transaction {
     //Hàm khởi tạo
     Transaction();
     Transaction(std::string maGD, std::string thoiGian,
-                std::string loaiGD, double soTien, 
+                std::string loaiGD, long long soTien, 
                 std::string soTKGui, std::string soTKNhan);
     
     //Hàm getters
     std::string getMaGD() const;
     std::string getThoiGian() const;
     std::string getLoaiGD() const;
-    double getSoTien() const;
+    long long getSoTien() const;
     std::string getSoTKNhan() const;
     std::string getSoTKGui() const;
 

@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-//1. Hàm khởi tạo
+//Hàm khởi tạo
 Transaction::Transaction(){
     this->maGD = "CHUA_CO";
     this->thoiGian = "N/A";
@@ -15,7 +15,7 @@ Transaction::Transaction(){
 Transaction::Transaction(std::string maGD, 
                 std::string thoiGian, 
                 std::string loaiGD,
-                double soTien, std::string soTKGui ,
+                long long soTien, std::string soTKGui ,
                 std::string soTKNhan) {
     this->maGD = maGD;
     this->thoiGian = thoiGian;
@@ -25,7 +25,7 @@ Transaction::Transaction(std::string maGD,
     this->soTKNhan = soTKNhan;
 }
 
-//2. Hàm getters
+//Hàm getters
 std::string Transaction::getMaGD() const {
     return this->maGD;
 }
@@ -35,11 +35,18 @@ std::string Transaction::getThoiGian() const {
 std::string Transaction::getLoaiGD() const { 
     return this->loaiGD; 
 }
-double Transaction::getSoTien() const { 
+long long Transaction::getSoTien() const { 
     return this->soTien; 
 }
+std::string Transaction::getSoTKGui() const {
+    return this->soTKGui;
+}
+std::string Transaction::getSoTKNhan() const {
+    return this->soTKNhan;
+}
 
-//3. Hàm sinh mã tự động
+
+//Hàm sinh mã tự động
 std::string Transaction::sinhMaGD(int soThuTuMoi) {
     std::string chuoiSo = std::to_string(soThuTuMoi);
     while (chuoiSo.length() < 3) {
@@ -52,7 +59,7 @@ void Transaction::xuatThongTin() const {
     std::cout << "[" << this->thoiGian << "] " 
               << "Ma GD: " << this->maGD 
               << " | Loai: " << this->loaiGD 
-              << " | So tien: " << std::fixed << this->soTien << " VND";
+              << " | So tien: " << this->soTien << " VND";
 
     //Nếu là gd ckhoan thì in thêm người nhận
     if (this->loaiGD == "CHUYEN_KHOAN" && this->soTKNhan != "N/A") {
